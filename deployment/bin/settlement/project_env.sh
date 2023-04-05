@@ -1,4 +1,4 @@
 #!/bin/zsh
 
-export project_jar_name="settlement.jar"
-export service_name=settlement
+export PROJECT_JAR_NAME="settlement.jar"
+export SERVICE_NAME=settlement

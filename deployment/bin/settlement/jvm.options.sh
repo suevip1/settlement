@@ -19,3 +19,5 @@ export X_MAX_PERM_SIZE="-XX:MaxMetaspaceSize=128m"
 export X_SURVIVOR_PATIO="-XX:SurvivorRatio=4"
 
 GC_LOG="$service_home/logs/gc.$(data "+%Y%m%d%H%M%S".%N).log"
+
+JVM_OPTS="$XMS $XMX $XMN $X_PERM_SIZE $X_MAX_PERM_SIZE $X_SURVIVOR_RATIO -XX:+UseConcMarkSweepGC -XX:+ParallelRefProcEnabled -XX:+UseParNewGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:$GC_LOG -XX:CMSInitiatingOccupancyFraction=40 -XX:+UseCMSInitiatingOccupancyOnly -XX:+CMSClassUnloadingEnabled -XX:+DisableExplicitGC -XX:+PrintPromotionFailure -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$service_home/logs/oom.dump"
