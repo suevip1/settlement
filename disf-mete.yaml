@@ -1,0 +1,10 @@
+# 模块服务元信息
+
+owner: yangwu
+language: java
+description: 清结算
+deployOdinNs:
+  - settlement.moneyhub.pay.ibt.didi.com
+mainProtocol:
+  protocol: http
+  port: 9090

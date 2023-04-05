@@ -1,0 +1,10 @@
+# 模块评审人列表
+reviewers: yangwu,zhangsan,lisi
+# 模块的订阅人，会受到 CR 通知，但是没有 CR 审批权限，可以添加行评论
+subscriber: yangwu,zhagnsan,lisi
+# 模块负责人
+owners: yangwu
+# 代码评审策略
+strategy: default
+# 强制 cr 的 branch 列表
+force: master
