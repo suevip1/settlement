@@ -1,13 +1,11 @@
-package com.example.settlement.utils.datetime;
+package com.example.settlement.common.utils.datetime;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 /**
  * 日期格式化工具类
@@ -29,11 +27,5 @@ public class DateTimeFormatUtil {
             log.error("DateTimeFormatUtil format error", e);
         }
         return "";
-    }
-
-    public static void main(String[] args) {
-        log.info("info");
-        log.warn("warn");
-        log.error("error");
     }
 }
