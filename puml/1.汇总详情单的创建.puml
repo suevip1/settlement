@@ -1,0 +1,33 @@
+@startuml
+
+floating note: 汇总详情单的创建
+
+start
+:清算模块请求单号;
+	floating note right
+	1. userId 2. product
+	3. tradeType 4. tradeTime
+	end note
+
+:**获取 SummaryControlModel**;
+	floating note
+	1. 获取结算配置
+	2. 获取生效 details
+	end note
+
+:查询已存在的 detail;
+	floating note right
+	1. tradeType 2. transTime
+	3. transTime 转为标准汇总时间点
+	end note
+
+if (存在) then (yes)
+else (no)
+	:组装初始化时间;
+	:落库;
+endif
+:返回 detail 单号;
+
+stop
+
+@enduml

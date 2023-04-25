@@ -1,0 +1,42 @@
+@startuml
+receiving: 交易接收中
+received: 交易已接收
+init: 清算初始态
+cleared: 清分完成
+clear_fail: 清分失败
+tallied: 记账完成
+tally_fail: 清分失败
+summarised: 汇总完成
+summarise_fail: 汇总失败
+risk_checked: 检查完成
+risk_check_fail: 检查失败
+discard: 丢弃清分
+repairing: 数据有误待修复
+
+[*] --> receiving: <接受交易 binlog>
+receiving --> received: <准入>
+receiving --> discard: <不符合清算准入条件，如内部商户等>
+received --> init: <开始清分>
+received --> repairing: <数据存在问题，不能清算，如卡组问题>
+repairing --> init: <重新清分>
+init --> cleared: <1. 计算各种费用，2. 匹配记账模式>
+init --> clear_fail
+clear_fail --> cleared
+cleared --> tallied: <根据记账模式和费用详情进行幂等校验>
+cleared --> tally_fail
+tally_fail --> tallied
+tallied --> summarised: <汇总到结算详情单>
+tallied --> summarise_fail
+summarise_fail --> summarised
+summarised --> risk_checked: <善后>
+summarised --> risk_check_fail
+risk_check_fail --> risk_checked
+risk_checked --> [*]
+received --> risk_checked
+received --> risk_check_fail
+discard --> [*]
+
+
+
+
+@enduml

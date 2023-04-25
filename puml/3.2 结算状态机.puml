@@ -1,0 +1,25 @@
+@startuml
+init: 初始态
+accumulating: 累加中，可汇总结算单
+clearing: 清算中，暂停累计动作
+waiting_settled: 清算完成，等待结算（净额）
+waiting_settled_trade_fee: 清算完成，等待结算（手续费）
+waiting_settled_tax: 清算完成，等待结算（税费）
+settled: 结算完成，启动提现流程
+risk_management: 风控拦截
+
+[*] --> init
+init --> accumulating
+init --> waiting_settled: <周期内无汇总详情单>
+accumulating --> clearing: <周期结束/人工 前提：到达清算截止时间>
+accumulating --> risk_management: <周期内有风控拦截交易类型汇总单 前提：到达清算截止时间>
+accumulating --> accumulating: <定时汇总>
+risk_management --> clearing: <周期内所有交易风控回传结果成功>
+clearing --> waiting_settled: <可以结算>
+clearing --> accumulating: <未达条件>
+waiting_settled --> waiting_settled_trade_fee: <账户操作成功（净额），前提：到达结算截止时间>
+waiting_settled_trade_fee --> waiting_settled_tax: <账户操作成功（手续费），前提：到达结算截止时间>
+waiting_settled_tax --> settled: <账户操作成功（税费），前提：到达结算截止时间>
+settled --> [*]
+
+@enduml

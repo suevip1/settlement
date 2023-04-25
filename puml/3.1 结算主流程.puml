@@ -1,0 +1,48 @@
+@startuml
+floating note: 清算单的创建
+start
+:XXL 触发(每小时);
+:查找所有商户(by 结算配置);
+:XXL 分片;
+:确定当前商户;
+:获取商户结算单(未结算);
+package 核心流程 {
+	:确定当前结算单;
+	:组装结算单 BillModel;
+		floating note right
+		    1.结算单
+		    2.已挂载的汇总详情单
+		end note
+	if (达到结算条件) then (yes)
+		:init 处理;
+		 	floating note: 直达 settled 状态
+		:accumulating 处理;
+		    floating note: 停止计费，更新 主+详
+		if (含有支付的汇总单) then (yes)
+		    :riskManagement 风控拦截;
+		        floating note: 直到收到风控结果或者超过结算时间14个小时
+		else (no)
+		endif
+		:clearing 处理;
+			floating note: 特殊: 达不到起结条件
+		:waiting-settled 处理;
+			floating note: 操作账户，失败重试
+		:waiting-settled-trade-fee 处理;
+			floating note: 操作账户，失败重试
+		:waiting-settled-tax 处理;
+			floating note: 操作账户，失败重试
+		:settle 处理;
+			floating note: log 通知
+	else (no)
+		:汇总详情;
+			floating note right: 未绑定(settleId为空)
+		:过滤;
+			floating note right: 时间上不属于结算单
+		:组装计费开始事件;
+			floating note right: !!存在汇总单
+		:落库;
+			floating note right: 记录绑定关系，汇总单还可继续汇总
+	endif
+}
+stop
+@enduml

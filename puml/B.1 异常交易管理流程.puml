@@ -1,0 +1,25 @@
+@startuml
+Receiving: 异常清算流水，分析 stuck 原因（0）
+AutoRetrying: 自动重试中（10）
+RetryFailed: 重试失败（11）
+WaitingManualProcess: 等待人工处理（30）
+ManualChangeDate: 数据处理变换完成（31）
+ManualMarked: 标记数据异常，忽略（32）
+Completed: 完成（20）
+
+[*] --> Receiving
+Receiving --> AutoRetrying: <普通失败：DB更新，账户RPC，汇总失败等>
+Receiving --> WaitingManualProcess: <配置错误：枚举未覆盖，交易类型，费率缺失等>
+AutoRetrying --> RetryFailed: <重试失败>
+AutoRetrying --> Completed: <重试成功>
+RetryFailed --> AutoRetrying: <未达到重试上限，继续重试>
+RetryFailed --> WaitingManualProcess: <达到重试上限，等待人工处理>
+WaitingManualProcess -u-> ManualChangeDate: <人工调整交易数据>
+ManualChangeDate -u-> AutoRetrying: <清除重试计数，继续重试>
+WaitingManualProcess --> ManualMarked: <异常交易，无需清算>
+ManualMarked --> Completed: <直接完成>
+Completed --> [*]
+
+
+
+@enduml

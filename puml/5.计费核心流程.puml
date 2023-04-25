@@ -1,0 +1,20 @@
+@startuml
+start
+:清算调用计费;
+:查找 ChargeCalculator;
+package ChargeCalculator {
+	:组装 GroupKey;
+	:确定一组 SubitemComputer;
+	package SubitemComputer 循环 {
+		:使用 IMatcher 判断匹配;
+		:使用 IComputer 计费;
+		:组装 FeeCalcItem;
+	}
+	:得到一组 FeeCalcItem;
+	:合法性校验;
+}
+:净额计算;
+:组装净额 FeeCalcItem;
+:返回;
+stop
+@enduml

@@ -1,0 +1,87 @@
+@startuml
+class ChargeCalculatorService {
+	ChargeCalculatorRepository repo
+}
+
+class TradeInfo {
+	Long userId
+	Integer userType
+	Integer userProduct
+	Integer userTradeType
+	Integer payType
+	Date tradeTime
+	long amount
+	String currency
+	Integer cardGroup
+}
+
+class FeeCalcItem {
+	FeeConf conf
+	long feeAmount
+	String currency
+}
+
+class ChargeCalculator {
+	Map<GroupKey, SubitemComputer> computers
+}
+
+class GroupKey {
+	Integer productType
+	Integer tradeType
+	Integer payType
+}
+
+class SubitemComputer {
+	FeeConf feeConf
+	TradeMatcher matcher
+	IComputer computer
+}
+
+interface IComputer
+
+class FeeConf {
+	Integer feeCode
+	String configId
+	String currency
+	Integer collectingType
+}
+
+class TradeMatcher {
+	Integer productType
+	Integer tradeType
+	Integer payType
+	Integer currency
+	Integer cardGroup
+	Date activationTime
+	Date expirationTime
+}
+
+class BinaryLinearComputer {
+	long fixedFee
+	float feeRate
+	long minFeeAmount
+	long maxFeeAmount
+}
+
+class LadderBinaryLinearComputer {
+	SortedMap<Long, IComputer> ladderComputers
+}
+
+ChargeCalculatorService ..> TradeInfo :参数
+ChargeCalculatorService ..> FeeCalcItem :返回值
+ChargeCalculatorService ..> ChargeCalculator :计算器
+
+ChargeCalculator *-- GroupKey
+ChargeCalculator o-- SubitemComputer
+ChargeCalculator ..> TradeInfo :计费
+ChargeCalculator ..> FeeCalcItem :计费结果
+
+SubitemComputer o-- FeeConf
+SubitemComputer o-- TradeMatcher
+SubitemComputer o-- IComputer
+
+IComputer <|.. BinaryLinearComputer
+IComputer <|.. LadderBinaryLinearComputer
+
+
+@enduml

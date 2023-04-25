@@ -1,0 +1,25 @@
+@startuml
+state clearing_fail #lightgreen
+state repairing #lightgreen
+
+receiving: 交易接受中
+received: 交易已接收
+clearing_etc: 正常清分节点
+clearing_fail: 清分节点失败
+cleared: 清分结束
+discard: 丢弃清分
+repairing: 数据有误待修复
+
+[*] --> receiving: <接收到交易 binlog>
+receiving --> received: <交易已接收>
+received --> discard: <不符合准入条件>
+received --> clearing_etc: <开始清分>
+received --> repairing: <数据存在问题不能清算，如卡组问题>
+repairing --> clearing_etc: <重新清分>
+clearing_etc --> clearing_etc: <正常清分流程>
+clearing_etc --> clearing_fail: <任何原因失败>
+clearing_etc --> cleared
+clearing_fail --> clearing_etc
+cleared --> [*]
+discard --> [*]
+@enduml

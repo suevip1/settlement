@@ -1,0 +1,38 @@
+@startuml
+
+floating note: 结算的创建
+
+start
+
+:XXL 触发(每小时);
+:查找所有商户(by 结算配置);
+:XXL 分片;
+:确定当前商户;
+package 核心流程 {
+	:获取 SettleCtrlModel;
+		floating note right
+			1. 获取 SettleConfig (所有已经生效的配置)
+			2. 获取所有 active 结算单，并分组 (时间*产品)
+		end note
+	:获取 SettleID;
+		floating note
+			1. product
+			2. tradeTime
+		end note
+	#lightpink:交易时间转为标准结算时间;
+		floating note
+			1. 转成当地时间 2. truncate 到天
+			3. 按周期规则处理
+		end note
+	if (查询 ID 是否存在) then (yes)
+		stop
+	else (no)
+		:SettleCtrlModel 组装初始化事件;
+		:判断是否符合创建规则;
+		:创建结算单;
+	endif;
+}
+
+stop
+
+@enduml
