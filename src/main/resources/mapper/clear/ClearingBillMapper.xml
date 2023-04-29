@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.settlement.clear.infra.db.mapper.IClearingBillMapper">
+
+    <select id="selectByTradeIdAndTradeType" resultType="com.example.settlement.clear.infra.db.entity.ClearingBillEntity">
+                                                                                                                             </select>
+
+    <insert id="insertSelective">
+                                    </insert>
+
+    <update id="updateRemark" parameterType="com.example.settlement.clear.infra.db.entity.ClearingBillEntity">
+    update clearing_bill
+    <set>
+        <if test="remark != null">
+            remark = #{remark},
+        </if>
+        <if test="modifyTime != null">
+           modify_time = #{modifyTime},
+        </if>
+    </set>
+    where trade_id = #{tradeId} and trade_type = #{tradeType}
+</update>
+</mapper>

@@ -1,5 +1,7 @@
 package com.example.settlement.common.constant;
 
+import com.example.settlement.common.exceptions.ErrorNo;
+
 /**
  * 通用常量
  * @author yangwu_i

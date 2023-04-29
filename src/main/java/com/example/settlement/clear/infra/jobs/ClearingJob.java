@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.settlement.clear.infra.db.entity.ClearingBillEntity;
 import com.example.settlement.clear.infra.db.mapper.IClearingBillShardingMapper;
 import com.example.settlement.clear.model.ClearingService;
-import com.example.settlement.clear.model.enums.ClearStatusEnum;
+import com.example.settlement.clear.infra.enums.ClearStatusEnum;
 import com.example.settlement.common.constant.CommonConstant;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
@@ -53,9 +53,9 @@ public class ClearingJob {
                 if (i % shardTotal == shardIndex) {
                     log.info("清分清算重试任务开始执行，当前处理的表为：{}，机器编号为：{}， 机器总数为：{}", i, shardIndex, shardTotal);
 
-                    int pageNum = 1;
-                    int startIndex = 0;
-                    AtomicInteger successCount = new AtomicInteger();
+                    int pageNum = 1; // 页码
+                    int startIndex = 0; // 分页起始条目
+                    AtomicInteger successCount = new AtomicInteger(); // 表成功数
                     Date tradeFinishTime = getTradeFinishTime();
                     Long maxId = clearingBillShardingMapper.getMaxId(TABLE_NAME + CommonConstant.UNDERLINE + i);
                     if (maxId == null || maxId == 0) {
@@ -72,6 +72,7 @@ public class ClearingJob {
                         }
 
                         // 分页查询未清算成功的清算数据
+                        // todo: 分页查询 limit 原理，优化
                         List<ClearingBillEntity> list = clearingBillShardingMapper.selectShardingPageByStatus(TABLE_NAME + CommonConstant.UNDERLINE + i, ClearStatusEnum.SUCCESS.getStatus(), tradeFinishTime, maxId + 1, startIndex, PAGE_SIZE);
                         Date now = new Date();
                         list.stream().filter((e) -> e.getTradeFinishTime().compareTo(now) < 0).forEach(e -> {

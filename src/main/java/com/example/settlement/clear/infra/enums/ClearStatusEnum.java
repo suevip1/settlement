@@ -1,6 +1,7 @@
-package com.example.settlement.clear.model.enums;
+package com.example.settlement.clear.infra.enums;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 
 /**
@@ -26,4 +27,13 @@ public enum ClearStatusEnum {
     ;
     private int status;
     private String desc;
+
+    public static ClearStatusEnum valueOf(int status) {
+        for (ClearStatusEnum value : values()) {
+            if (value.getStatus() == status) {
+                return value;
+            }
+        }
+        return null;
+    }
 }
