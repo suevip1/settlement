@@ -5,9 +5,8 @@ package com.example.settlement.charge.domain.feecomputer.feeitem;
  * @author yangwu_i
  * @date 2023/4/10 23:10
  */
-public record FeeItemConfig(
-        Long feeUserId,
-        Integer feeItemCode,
-        Integer feeItemConfigId,
-        String feeItemCurrency) {
+public record FeeConfig(
+        Integer feeCode,
+        String configId,
+        String currency) {
 }

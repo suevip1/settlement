@@ -8,7 +8,7 @@ import java.util.Date;
  * @date 2023/4/10 22:31
  */
 public record TradeInfo(
-        Integer userId,
+        Long userId,
         Integer userType,
         Integer userProduct,
         Integer userTradeType,

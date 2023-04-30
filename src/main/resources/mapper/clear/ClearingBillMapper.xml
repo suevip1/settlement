@@ -20,4 +20,11 @@
     </set>
     where trade_id = #{tradeId} and trade_type = #{tradeType}
 </update>
+
+    <update id="updateFee" parameterType="com.example.settlement.clear.infra.db.entity.ClearingBillEntity">
+        update clearing_bill
+            <set>
+            </set>
+        where trade_id = #{tradeId} and trade_type = #{tradeType}
+    </update>
 </mapper>

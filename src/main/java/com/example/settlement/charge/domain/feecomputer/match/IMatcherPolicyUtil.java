@@ -13,7 +13,7 @@ public interface IMatcherPolicyUtil {
     IMatcherPolicyUtil PRODUCT_TYPE_MATCH_POLICY = (tradeMatcher, tradeInfo) -> Objects.equals(tradeMatcher.productType(), tradeInfo.userProduct());
     IMatcherPolicyUtil TRADE_TYPE_MATCH_POLICY = (tradeMatcher, tradeInfo) -> Objects.equals(tradeMatcher.tradeType(), tradeInfo.userTradeType());
     IMatcherPolicyUtil PAY_TYPE_MATCH_POLICY = (tradeMatcher, tradeInfo) -> Objects.equals(tradeMatcher.payType(), tradeInfo.userPayType());
-    IMatcherPolicyUtil TRADE_CURRENCY_MATCH_POLICY = (tradeMatcher, tradeInfo) -> Objects.equals(tradeMatcher.tradeCurrency(), tradeInfo.tradeCurrency());
+    IMatcherPolicyUtil TRADE_CURRENCY_MATCH_POLICY = (tradeMatcher, tradeInfo) -> Objects.equals(tradeMatcher.currency(), tradeInfo.tradeCurrency());
     IMatcherPolicyUtil ACTIVE_DATE_MATCH_POLICY = (tradeMatcher, tradeInfo) -> tradeMatcher.activeDate().before(tradeInfo.tradeTime());
     IMatcherPolicyUtil EXPIRE_DATE_MATCH_POLICY = (tradeMatcher, tradeInfo) -> tradeMatcher.expireDate().after(tradeInfo.tradeTime());
     IMatcherPolicyUtil[] FULL_MATCH_POLICIES = {

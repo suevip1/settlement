@@ -3,6 +3,8 @@ package com.example.settlement.common.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import static com.example.settlement.common.enums.FundDirectEnum.*;
+
 /**
  *
  * @author yangwu_i
@@ -11,8 +13,19 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum UserTradeTypeEnum {
-    PAY(1, "支付"),
-    REFUND(2, "退款");
-    private final Integer value;
+    PAY(1, "支付", DIRECT_PAYMENT),
+    REFUND(2, "退款", DIRECT_REFUND);
+    private final int value;
     private String desc;
+    private final FundDirectEnum direct;
+
+    public static UserTradeTypeEnum valueOf(int value) {
+        for (UserTradeTypeEnum userTradeTypeEnum : UserTradeTypeEnum.values()) {
+            if (userTradeTypeEnum.value == value) {
+                return userTradeTypeEnum;
+            }
+        }
+        return null;
+    }
+
 }

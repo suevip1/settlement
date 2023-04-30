@@ -18,4 +18,6 @@ public interface IClearingBillMapper {
     int insertSelective(ClearingBillEntity entity);
 
     int updateRemark(ClearingBillEntity entity);
+
+    int updateFee(ClearingBillEntity entity);
 }

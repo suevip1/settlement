@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.settlement.clear.infra.db.mapper.IClearingBillPayoutMapper">
+
+<select id="selectByOriginTradeIdAndFeeCodeList"
+            resultType="com.example.settlement.clear.infra.db.entity.ClearingBillPayoutEntity">
+    select * from clearing_bill_payout
+    where user_id = #{userId}
+    and origin_trade_id = #{originTradeId}
+    and origin_trade_type = #{originTradeType}
+    and fee_code in
+    <foreach collection="feeCodeList" item="feeCode" open="(" separator="," close=")">
+        #{feeCode}
+    </foreach>
+</select>
+
+</mapper>

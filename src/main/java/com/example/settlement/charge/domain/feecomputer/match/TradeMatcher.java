@@ -13,7 +13,7 @@ public record TradeMatcher(
         Integer productType,
         Integer tradeType,
         Integer payType,
-        String tradeCurrency,
+        String currency,
         Date activeDate,
         Date expireDate) {
     public boolean match(TradeInfo tradeInfo) {

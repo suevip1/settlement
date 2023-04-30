@@ -1,11 +1,17 @@
 package com.example.settlement.clear.model.calculate.impl;
 
+import com.example.settlement.charge.domain.ChargeCalculatorService;
 import com.example.settlement.clear.infra.db.entity.ClearingBillEntity;
+import com.example.settlement.clear.infra.db.mapper.IClearingBillMapper;
 import com.example.settlement.clear.infra.enums.ClearStatusEnum;
 import com.example.settlement.clear.infra.errorno.ClearingErrorNo;
 import com.example.settlement.clear.model.ClearResult;
 import com.example.settlement.clear.model.calculate.AbstractClearCalculateService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+
+import java.util.Date;
 
 /**
  *
@@ -14,9 +20,25 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RefundClearCalculateService extends AbstractClearCalculateService<ClearingBillEntity> {
+    @Resource
+    private IClearingBillMapper clearBillMapper;
+    @Resource
+    private ChargeCalculatorService calculatorService;
     @Override
     protected ClearResult doCalculate(ClearingBillEntity entity) {
-        return null;
+        // 查原支付订单
+        ClearingBillEntity originBill = clearBillMapper.selectByTradeIdAndTradeType(entity.getTradeId(), entity.getTradeType());
+        if (originBill == null) {
+            return ClearResult.buildFailResult(ClearingErrorNo.CLEAR_PROCESS_NOT_FOUND_ORIGIN_BILL);
+        }
+        ClearResult clearResult = calculatorService.calculateRefundFee(entity);
+        if (!clearResult.isSuccess()) {
+            return clearResult;
+        }
+        entity.setStatus(ClearStatusEnum.CLEAR.getStatus());
+        entity.setModifyTime(new Date());
+        Assert.isTrue(clearBillMapper.updateFee(entity) == 1, ClearingErrorNo.CLEAR_PROCESS_PAYIN_CALC_DB_UPDATE_FAIL.toString());
+        return ClearResult.buildSuccessResult();
     }
 
     @Override
