@@ -2,9 +2,13 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.settlement.config.mapper.SettlementConfigMapper">
+<mapper namespace="com.example.settlement.config.mapper.SettleConfigMapper">
 
 <select id="selectByUserId" resultType="com.example.settlement.config.entity.SettlementConfigEntity">
-    select * from settlement_config where user_id = #{userId}
+    select * from settle_config where user_id = #{userId}
 </select>
+
+<select id="selectActiveUsers" resultType="java.lang.Long">
+    select user_id from settle_config where archive = 0 and disable = 0
+    </select>
 </mapper>

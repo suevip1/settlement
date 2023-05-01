@@ -1,17 +1,16 @@
 package com.example.settlement.settle;
 
+import com.example.settlement.common.event.UnexpectedEvent;
 import com.example.settlement.common.exceptions.ErrorNoException;
-import com.example.settlement.config.ConfigMaintainService;
-import com.example.settlement.settle.infra.SettlementErrorNo;
+import com.example.settlement.settle.infra.SettleErrorNo;
+import com.example.settlement.settle.model.event.SettleBillInited;
 import com.example.settlement.settle.model.event.SettleEventHandler;
 import com.example.settlement.settle.model.event.SummaryStarted;
-import com.example.settlement.settle.model.valueobj.DetailId;
-import com.example.settlement.settle.model.valueobj.SettleModel;
-import com.example.settlement.settle.model.valueobj.SummaryInfo;
-import com.example.settlement.settle.model.valueobj.SummaryModel;
+import com.example.settlement.settle.model.valueobj.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -23,7 +22,7 @@ import java.util.Date;
  */
 @Slf4j
 @Service
-public class SettlementService {
+public class SettleService {
 
     @Resource
     private SettleConfigRepo configRepo;
@@ -52,7 +51,7 @@ public class SettlementService {
             transTime = currentDate;
             info = model.getDetailId(productType, tradeType, transTime);
             if (model.hasAttached2BillAndSettled(info)) {
-                throw new ErrorNoException(SettlementErrorNo.SUMMARY_DETAIL_HAS_SETTLED, "");
+                throw new ErrorNoException(SettleErrorNo.SUMMARY_DETAIL_HAS_SETTLED, "");
             }
         }
 
@@ -63,5 +62,22 @@ public class SettlementService {
         SummaryStarted summaryStarted = model.summaryInitialized(productType, tradeType, transTime);
         eventHandler.process(summaryStarted);
         return new DetailId("", summaryStarted.getDetailId());
+    }
+
+    public SettleId createSettleId(Long userId, Integer userProduct, Date transTime) {
+        SettleModel model = configRepo.getUserSettleModel(userId);
+        String settleId = model.getSettleId(userProduct, transTime);
+        if (settleId != null) {
+            return new SettleId(settleId);
+        }
+        // 生成当前结算单
+        Pair<SettleBillInited, UnexpectedEvent> result = model.billInited(userProduct, transTime);
+        if (result.getLeft() != null) {
+            eventHandler.process(result.getLeft());
+            return new SettleId(result.getLeft().getSettleId());
+        } else {
+            log.error("createSettleId failed, userId={}, userProduct={}, transTime={}", userId, userProduct, transTime);
+            return new SettleId(null);
+        }
     }
 }

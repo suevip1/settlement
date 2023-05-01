@@ -21,7 +21,7 @@ import com.example.settlement.common.exceptions.ErrorNoException;
 import com.example.settlement.config.apollo.CalculateTaxFeeSwitchConfig;
 import com.example.settlement.config.entity.SettlementConfigEntity;
 import com.example.settlement.config.entity.TaxRuleConfig;
-import com.example.settlement.settle.SettlementQueryRepo;
+import com.example.settlement.settle.SettleQueryRepo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class ChargeCalculatorService {
     private ChargeCalculatorRepo repo;
 
     @Resource
-    private SettlementQueryRepo settlementQueryRepo;
+    private SettleQueryRepo settleQueryRepo;
     @Resource
     private IClearingBillMapper clearBillMapper;
 
@@ -65,7 +65,7 @@ public class ChargeCalculatorService {
         long taxFee = 0;
         Date startTime = CalculateTaxFeeSwitchConfig.getStartTime();
         if (new Date().after(startTime)) {
-            List<TaxRuleConfig> taxRules = settlementQueryRepo.fetchTaxRule(info.userId());
+            List<TaxRuleConfig> taxRules = settleQueryRepo.fetchTaxRule(info.userId());
             if (!CollectionUtils.isEmpty(taxRules)) {
                 for (TaxRuleConfig taxRule : taxRules) {
                     switch (TaxTypeEnum.valueOf(taxRule.getTaxType())) {

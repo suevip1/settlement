@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class SettlementQueryRepo {
+public class SettleQueryRepo {
 
     @Resource
     private ApolloMerchantConfig merchantConfig;

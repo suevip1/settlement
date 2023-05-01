@@ -1,9 +1,8 @@
 package com.example.settlement.settle.model.valueobj;
 
-import com.alibaba.fastjson2.util.UUIDUtils;
 import com.example.settlement.clear.model.ClearingSetting;
 import com.example.settlement.common.exceptions.ErrorNoException;
-import com.example.settlement.settle.infra.SettlementErrorNo;
+import com.example.settlement.settle.infra.SettleErrorNo;
 import com.example.settlement.settle.model.event.SummaryStarted;
 
 import java.util.Date;
@@ -29,7 +28,7 @@ public record SummaryModel(
 
     private SettleConfig getConfig(int userProduct, Date transTime) {
          return configs.values().stream().filter(e -> e.match(userId, userProduct, transTime))
-                 .max(SettleConfig::compareTo).orElseThrow(() -> new ErrorNoException(SettlementErrorNo.CONFIG_NOT_FOUND, "配置未找到" + userId));
+                 .max(SettleConfig::compareTo).orElseThrow(() -> new ErrorNoException(SettleErrorNo.CONFIG_NOT_FOUND, "配置未找到" + userId));
     }
 
     public SummaryInfo getDetailId(Integer productType, Integer tradeType, Date transTime) {

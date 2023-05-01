@@ -1,7 +1,7 @@
 package com.example.settlement.config;
 
 import com.example.settlement.config.entity.SettlementConfigEntity;
-import com.example.settlement.config.mapper.SettlementConfigMapper;
+import com.example.settlement.config.mapper.SettleConfigMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,9 +17,13 @@ import java.util.List;
 @Service
 public class ConfigMaintainService {
     @Resource
-    private SettlementConfigMapper settlementConfigMapper;
+    private SettleConfigMapper settleConfigMapper;
 
     public List<SettlementConfigEntity> getSettleConfig(Long userId) {
-        return settlementConfigMapper.selectByUserId(userId);
+        return settleConfigMapper.selectByUserId(userId);
+    }
+
+    public List<Long> selectActiveUsers() {
+       return settleConfigMapper.selectActiveUsers();
     }
 }

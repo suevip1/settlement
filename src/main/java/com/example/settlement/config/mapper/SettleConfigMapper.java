@@ -12,7 +12,9 @@ import java.util.List;
  */
 @Mapper
 // @Master
-public interface SettlementConfigMapper {
+public interface SettleConfigMapper {
 
     List<SettlementConfigEntity> selectByUserId(Long userId);
+
+    List<Long> selectActiveUsers();
 }

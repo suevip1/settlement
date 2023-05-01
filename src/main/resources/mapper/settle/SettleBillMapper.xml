@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.settlement.settle.infra.db.mapper.SettleBillMapper">
+
+<select id="selectAllSettleInfo" resultType="com.example.settlement.settle.model.valueobj.SettleBillInfo">
+    select  * from settlement_bill
+    where user_id = #{userId}
+    and settle_status in
+    <foreach collection="statusList" item="status" index="index" open="(" separator="," close=")">
+        #{status}
+    </foreach>
+    </select>
+
+<insert id="insertSelective" parameterType="com.example.settlement.settle.infra.db.entity.SettleBillEntity">
+    insert into settlement_bill
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="countryCode != null">country_code,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="userType != null">user_type,</if>
+            <if test="configId != null">config_id,</if>
+            <if test="settleId != null">settle_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+
+        </trim>
+</insert>
+</mapper>

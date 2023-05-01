@@ -3,6 +3,7 @@ package com.example.settlement.settle.model.event;
 import com.example.settlement.common.exceptions.ErrorNo;
 import com.example.settlement.settle.infra.db.entity.SettleBillEntity;
 import com.example.settlement.settle.infra.db.entity.SettleDetailEntity;
+import com.example.settlement.settle.infra.db.mapper.SettleBillMapper;
 import com.example.settlement.settle.infra.db.mapper.SettleDetailMapper;
 import com.example.settlement.settle.infra.enums.SettleStatusEnum;
 import jakarta.annotation.Resource;
@@ -22,6 +23,8 @@ import org.springframework.util.Assert;
 public class SettleEventHandler {
     @Resource
     private SettleDetailMapper detailMapper;
+    @Resource
+    private SettleBillMapper billMapper;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public void process(SummaryStarted summaryStarted) {
@@ -29,5 +32,27 @@ public class SettleEventHandler {
         BeanUtils.copyProperties(summaryStarted, entity);
         entity.setState(SettleStatusEnum.ACCUMULATING.getValue());
         Assert.isTrue(detailMapper.insertSelective(entity) == 1, ErrorNo.DB_INSERT_ERROR.toString());
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public void process(SettleBillInited event) {
+        SettleBillEntity entity = SettleBillEntity.builder()
+                .countryCode(event.getCountryCode())
+                .userId(event.getUserId())
+                .userType(event.getUserType())
+                .configId(event.getConfigId())
+                .settleId(event.getSettleId())
+                .settleMode(event.getSettleMode())
+                .settleCycle(event.getSettleCycle())
+                .settleTime(event.getSettleTime())
+                .currency(event.getCurrency())
+                .liquidStartTime(event.getLiquidStartTime())
+                .liquidEndTime(event.getLiquidEndTime())
+                .settleStartTime(event.getSettleStartTime())
+                .settleEndTime(event.getSettleEndTime())
+                .settleStatus(SettleStatusEnum.INIT.getValue())
+                .remark(event.getRemark())
+                .version(0).build();
+        Assert.isTrue(billMapper.insertSelective(entity) == 1, ErrorNo.DB_INSERT_ERROR.toString());
     }
 }

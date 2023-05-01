@@ -18,11 +18,10 @@ import com.example.settlement.common.enums.SettleModeEnum;
 import com.example.settlement.common.enums.UserTradeTypeEnum;
 import com.example.settlement.common.exceptions.ErrorNo;
 import com.example.settlement.common.exceptions.ErrorNoException;
-import com.example.settlement.settle.SettlementService;
+import com.example.settlement.settle.SettleService;
 import com.example.settlement.settle.infra.db.entity.SettleDetailEntity;
 import com.example.settlement.settle.infra.db.mapper.SettleDetailMapper;
 import com.example.settlement.settle.model.valueobj.DetailId;
-import com.example.settlement.settle.model.valueobj.SettleModel;
 import com.example.settlement.stuck.ExecResult;
 import com.example.settlement.stuck.StuckFlowAppService;
 import jakarta.annotation.Resource;
@@ -50,6 +49,8 @@ public class ClearingService {
     private IClearingBillMapper clearBillMapper;
     @Resource
     private CallbackNotifyService callbackNotifyService;
+    @Resource
+    private SettleService settleService;
     @Resource
     private StuckFlowAppService stuckFlowService;
     @Resource
@@ -182,22 +183,19 @@ public class ClearingService {
         }
     }
 
-    @Resource
-    private SettlementService settlementService;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     protected ClearResult accumulateFeeItems(ClearingBillEntity entity) {
         if (entity.getStatus() == ClearStatusEnum.TRANS_TALLY.getStatus() ||
                 entity.getStatus() == ClearStatusEnum.REALTIME_SETTLE_NET_TALLY.getStatus()) {
             // 获取结算单号 （同类型多笔交易汇总到一个单子）
-            DetailId detailId = settlementService.createDetailId(entity.getUserId(), entity.getProductType(), entity.getTradeType(), entity.getTradeFinishTime());
+            DetailId detailId = settleService.createDetailId(entity.getUserId(), entity.getProductType(), entity.getTradeType(), entity.getTradeFinishTime());
             if (detailId == null || detailId.detailId() == null) {
                 log.error("获取汇总单号失败，清分实体：{}", entity);
                 return ClearResult.buildFailResult(ClearingErrorNo.CLEAR_PROCESS_GET_DETAIL_ID_ERROR);
             }
             // 查清分索引表
             ClearIndexEntity idx = ClearIndexEntity.builder().
-                    userId(entity.getUserId()).
                     tradeId(entity.getTradeId()).
                     tradeType(entity.getTradeType()).
                     build();
@@ -258,9 +256,6 @@ public class ClearingService {
         createTaxFeeClearIndex(entity, detailId);
         createNetClearIndex(entity, detailId);
     }
-
-
-
 
     private void createTradeFeeClearIndex(ClearingBillEntity entity, DetailId detailId) {
         int feeType = SettleModeEnum.REAL_TIME.getValue() == entity.getSettleMode() ? FeeTypeEnum.SETTLED_NET_AMOUNT.getCode() : FeeTypeEnum.UNSETTLED_NET_AMOUNT.getCode();
