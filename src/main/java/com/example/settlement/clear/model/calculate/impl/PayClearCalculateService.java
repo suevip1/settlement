@@ -16,6 +16,7 @@ import com.example.settlement.common.exceptions.ErrorNoException;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -36,6 +37,8 @@ public class PayClearCalculateService extends AbstractClearCalculateService<Clea
 
     @Resource
     private IClearingBillMapper clearBillMapper;
+
+    @Transactional(rollbackFor = Exception.class)
     @Override
     protected ClearResult doCalculate(ClearingBillEntity entity) {
         // 组装计费参数

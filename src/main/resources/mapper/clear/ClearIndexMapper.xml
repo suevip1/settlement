@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.settlement.clear.infra.db.mapper.IClearIndexMapper">
+<select id="selectBy" resultType="com.example.settlement.clear.infra.db.entity.ClearIndexEntity">
+    select * from clear_index
+    where trade_id = #{tradeId} and trade_type = #{tradeType}
+</select>
+
+<insert id="insert" parameterType="com.example.settlement.clear.infra.db.entity.ClearIndexEntity">
+    insert into clear_index(trade_id, trade_type, fee_type, user_id, user_type, settle_id, detail_id, create_time, update_time)
+        values (#{tradeId}, #{tradeType}, #{feeType}, #{userId}, #{userType}, #{settleId}, #{detailId}, #{createTime}, #{updateTime})
+    </insert>
+</mapper>

@@ -1,4 +1,4 @@
-package com.example.settlement.settle.repo;
+package com.example.settlement.settle;
 
 import com.example.settlement.config.apollo.ApolloMerchantConfig;
 import com.example.settlement.config.apollo.MchBaseConfig;

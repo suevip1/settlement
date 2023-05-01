@@ -21,10 +21,9 @@ import com.example.settlement.common.exceptions.ErrorNoException;
 import com.example.settlement.config.apollo.CalculateTaxFeeSwitchConfig;
 import com.example.settlement.config.entity.SettlementConfigEntity;
 import com.example.settlement.config.entity.TaxRuleConfig;
-import com.example.settlement.settle.repo.SettlementQueryRepo;
+import com.example.settlement.settle.SettlementQueryRepo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.webresources.ExtractingRoot;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -32,8 +31,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
-
-import static com.example.settlement.charge.infra.enums.TaxTypeEnum.VAT;
 
 /**
  *

@@ -2,6 +2,8 @@ package com.example.settlement.clear.infra.errorno;
 
 import com.example.settlement.common.exceptions.ErrorNo;
 
+import java.io.ByteArrayOutputStream;
+
 /**
  *
  * @author yangwu_i
@@ -17,4 +19,9 @@ public interface ClearingErrorNo {
 
     ErrorNo BINLOG_PROCESS_ORIGIN_TRADE_NOT_EXIST = new ErrorNo(7, "binlog处理原交易不存在");
     ErrorNo CLEAR_PROCESS_NOT_FOUND_ORIGIN_BILL = new ErrorNo(8, "清分处理没有找到原订单");
+
+    ErrorNo CLEAR_PROCESS_UPDATE_STATUS_ERROR = new ErrorNo(9, "清分处理更新状态错误");
+    ErrorNo CLEAR_PROCESS_GET_DETAIL_ID_ERROR = new ErrorNo(10, "清分处理获取汇总详情ID错误");
+    ErrorNo CLEAR_PROCESS_DB_UPDATE_FAIL = new ErrorNo(11, "清分处理更新数据库失败");
+    ErrorNo CLEAR_PROCESS_DB_INSERT_FAIL = new ErrorNo(12, "清分处理插入数据库失败");
 }

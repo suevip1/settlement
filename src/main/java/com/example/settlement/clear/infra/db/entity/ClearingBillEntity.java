@@ -34,6 +34,7 @@ public class ClearingBillEntity implements Serializable {
     private String countryCode;
     private String currency;
     private Long tradeAmount; // 交易（支付、退款、拒付等）总额，分
+    private Long originTradeAmount; // 原交易总额，分
 
     private Long netAmount; // 净额，分
     private Long tradeFeeAmount; // 交易手续费， 分

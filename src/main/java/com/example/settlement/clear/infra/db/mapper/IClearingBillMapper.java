@@ -20,4 +20,6 @@ public interface IClearingBillMapper {
     int updateRemark(ClearingBillEntity entity);
 
     int updateFee(ClearingBillEntity entity);
+
+    int updateStatus(ClearingBillEntity entity, String tradeId, int oldStatus);
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.settlement.clear.infra.db.mapper.IClearPayoutIndexMapper">
+
+<insert id="insert" parameterType="com.example.settlement.clear.infra.db.entity.ClearPayoutIndexEntity">
+    insert into clear_payout_index(trade_id, origin_trade_id, trade_type, origin_trade_type,
+        user_id, user_type, trade_amount, origin_trade_amount, fee_type, trade_fee_amount, create_time, update_time )
+        values(#{tradeId}, #{originTradeId}, #{tradeType}, #{originTradeType}, #{userId}, #{userType}, #{tradeAmount}, #{originTradeAmount}, #{feeType}, #{tradeFeeAmount}, #{createTime}, #{updateTime})
+    </insert>
+</mapper>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.settlement.settle.infra.db.mapper.SettleDetailMapper">
+
+<select id="selectRecentDetails" resultType="com.example.settlement.settle.infra.db.entity.SettleDetailEntity">
+    select * from settle_detail
+    where user_id = #{userId} and summary_time >= #{summaryTime}
+</select>
+
+<insert id="insertSelective">
+    insert into settle_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="id != null">id,</if>
+        <if test="countryCode != null">country_code,</if>
+        <if test="userId != null">user_id,</if>
+        <if test="userType != null">user_type,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="id != null">#{id},</if>
+        <if test="countryCode != null">#{countryCode},</if>
+        <if test="userId != null">#{userId},</if>
+        <if test="userType != null">#{userType},</if>
+    </trim>
+</insert>
+
+<update id="updateFee" parameterType="com.example.settlement.settle.infra.db.entity.SettleDetailEntity">
+    update settle_detail
+        <set>
+            <if test="entity.totalCount != null">
+                total_count += #{entity.totalCount},
+            </if>
+            <if test="entity.totalProcessedFee != null">
+                total_processed_fee += #{entity.totalProcessedFee},
+            </if>
+            <if test="entity.totalUnProcessedFee != null">
+                total_unprocessed_fee += #{entity.totalUnProcessedFee},
+            </if>
+            <if test="entity.totalProcessedInstallmentFee != null">
+                total_processed_installment_fee += #{entity.totalProcessedInstallmentFee},
+            </if>
+            <if test="entity.totalUnProcessedInstallmentFee != null">
+                total_unprocessed_installment_fee += #{entity.totalUnProcessedInstallmentFee},
+            </if>
+            <if test="entity.totalProcessedTaxFee != null">
+                total_processed_tax_fee += #{entity.totalProcessedTaxFee},
+            </if>
+            <if test="entity.totalUnProcessedTaxFee != null">
+                total_unprocessed_tax_fee += #{entity.totalUnProcessedTaxFee},
+            </if>
+            <if test="entity.totalSettledNetAmount != null">
+                total_settled_net_amount += #{entity.totalSettledNetAmount},
+            </if>
+            <if test="entity.totalUnSettledNetAmount != null">
+                total_unsettle_net_amount += #{entity.totalUnSettledNetAmount},
+            </if>
+            <if test="entity.currency != null">
+                currency = #{entity.currency},
+            </if>
+            <if test="entity.remark != null">
+                remark = #{entity.remark},
+            </if>
+            <if test="entity.updateTime != null">
+                update_time = #{entity.updateTime},
+            </if>
+        </set>
+    where user_id = #{entity.userId} and detail_id = #{entity.detailId}
+    and user_trade_type = #{entity.userTradeType} and state = #{state}
+    </update>
+</mapper>

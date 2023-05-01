@@ -9,6 +9,7 @@ import com.example.settlement.clear.model.ClearResult;
 import com.example.settlement.clear.model.calculate.AbstractClearCalculateService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.Date;
@@ -24,6 +25,8 @@ public class RefundClearCalculateService extends AbstractClearCalculateService<C
     private IClearingBillMapper clearBillMapper;
     @Resource
     private ChargeCalculatorService calculatorService;
+
+    @Transactional(rollbackFor = Exception.class)
     @Override
     protected ClearResult doCalculate(ClearingBillEntity entity) {
         // 查原支付订单
