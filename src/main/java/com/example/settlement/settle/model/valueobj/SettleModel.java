@@ -27,6 +27,7 @@ public record SettleModel(
     public String getSettleId(Integer userProduct, Date transTime) {
         SettleConfig config = getMatchConfig(userProduct, transTime);
         Date settleTime = config.getSettleTime(transTime);
+        // 去重
         SettleBillInfo info = bills.get(new SettleKey(settleTime, userProduct));
         return Optional.ofNullable(info).map(SettleBillInfo::settleId).orElse(null);
     }
