@@ -18,11 +18,12 @@ public class SettleBillInited implements ExpectedEvent {
     private Long userId;
     private Integer userType;
     private String configId; // 结算配置id
-    private String settleId;
-    private Integer settleMode;
-    private Integer settleCycle;
+    private String settleId; // 结算单号
+    private Integer settleType; // 收单结算、代付结算
+    private Integer settleMode; // 实时结算、周期结算
+    private Integer settleCycle; // 结算周期
     private Date settleTime; // 结算日期
-    private String currency;
+    private String currency; // 结算币种
     private Date liquidStartTime; // 清算开始时间
     private Date liquidEndTime; // 清算结束时间
     private Date settleStartTime; // 结算开始时间

@@ -65,7 +65,7 @@ public record SettleConfig(Instant SETTLE_ZERO, ChronoUnit TRADE_CLEARING_SUMMAR
     }
 
     public Date getSettleTime(Date transTime) {
-        Date endTime = getLiquidEndDay(transTime);
+        Date endTime = getLiquidEndTime(transTime);
         ZonedDateTime zonedTime = endTime.toInstant().atZone(setting.getZoneId());
         SettleCycleEnum cycle = getSettleCycle();
         switch (cycle.getDelayCalcMode()) {
@@ -88,7 +88,7 @@ public record SettleConfig(Instant SETTLE_ZERO, ChronoUnit TRADE_CLEARING_SUMMAR
         }
     }
 
-    private Date getLiquidEndDay(Date transTime) {
+    public Date getLiquidEndTime(Date transTime) {
         SettleCycleEnum cycle = getSettleCycle();
 
         ZonedDateTime startTime = transTime.toInstant().atZone(setting.getZoneId()).truncatedTo(ChronoUnit.DAYS);
@@ -179,10 +179,54 @@ public record SettleConfig(Instant SETTLE_ZERO, ChronoUnit TRADE_CLEARING_SUMMAR
     }
 
     // 获取结算周期：实时结算、分期结算（后置汇总）、默认自然日+1生成结算单
-    private SettleCycleEnum getSettleCycle() {
+    public SettleCycleEnum getSettleCycle() {
         // todo: 待完成分期结算（后置汇总）模式
         return SettleModeEnum.REAL_TIME.getValue() == setting.getSettleMode() ?
                 SettleCycleEnum.DAY_AFTER_1_DAY :
                 SettleCycleEnum.valueOf(setting.getSettleMode());
+    }
+
+    // 获取清算开始时间
+    public Date getLiquidStartTime(Date transTime) {
+        SettleCycleEnum cycle = getSettleCycle();
+        ZonedDateTime startTime = transTime.toInstant().atZone(setting.getZoneId()).truncatedTo(ChronoUnit.DAYS);
+        switch (cycle.getSummaryMode()) {
+            case DAY -> {
+                return extendStartTime(startTime, ChronoUnit.DAYS, 1, cycle.getDelayCalcMode());
+            }
+            case WEEK -> {
+                startTime = startTime.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                return extendStartTime(startTime, WEEKS, 1, cycle.getDelayCalcMode());
+            }
+            case BIWEEK -> {
+                startTime = startTime.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                long weeks = WEEKS.between(startTime, SETTLE_ZERO.atZone(setting.getZoneId()));
+                startTime = startTime.minusWeeks(weeks % 2);
+                return extendStartTime(startTime, WEEKS, 2, cycle.getDelayCalcMode());
+            }
+            case MONTH -> {
+                startTime = startTime.with(TemporalAdjusters.firstDayOfMonth());
+                return extendStartTime(startTime, ChronoUnit.MONTHS, 1, cycle.getDelayCalcMode());
+            }
+            default -> throw new ErrorNoException(SettleErrorNo.SETTLE_UNSUPPORTED_CYCLE, "不支持的结算周期");
+        }
+    }
+
+    // 按天（工作日）情况下，汇总起始时间，自当日起回溯，遇工作日结束
+    // 按周（工作日）情况下，汇总起始时间，自当周起回溯，遇非全休工作周结束
+    // 以此类推 双周 月
+    private Date extendStartTime(ZonedDateTime startTime, ChronoUnit unit, int count, DelayCalcMode calcMode) {
+        switch (calcMode) {
+            case WORKDAY -> {
+                while (isAllHolidayForward(startTime, unit, count)) {
+                    startTime = startTime.minus(count, unit); // 回溯
+                }
+                return Date.from(startTime.toInstant());
+            }
+            case NATUAL_DAY -> {
+                return Date.from(startTime.toInstant());
+            }
+            default -> throw new ErrorNoException(SettleErrorNo.SETTLE_UNSUPPORTED_DELAY_MODE, "不支持的延期计算模式");
+        }
     }
 }

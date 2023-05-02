@@ -43,14 +43,15 @@ public class SettleEventHandler {
                 .configId(event.getConfigId())
                 .settleId(event.getSettleId())
                 .settleMode(event.getSettleMode())
+                .settleType(event.getSettleType())
                 .settleCycle(event.getSettleCycle())
                 .settleTime(event.getSettleTime())
-                .currency(event.getCurrency())
-                .liquidStartTime(event.getLiquidStartTime())
-                .liquidEndTime(event.getLiquidEndTime())
                 .settleStartTime(event.getSettleStartTime())
                 .settleEndTime(event.getSettleEndTime())
+                .liquidStartTime(event.getLiquidStartTime())
+                .liquidEndTime(event.getLiquidEndTime())
                 .settleStatus(SettleStatusEnum.INIT.getValue())
+                .currency(event.getCurrency())
                 .remark(event.getRemark())
                 .version(0).build();
         Assert.isTrue(billMapper.insertSelective(entity) == 1, ErrorNo.DB_INSERT_ERROR.toString());

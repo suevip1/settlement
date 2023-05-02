@@ -32,4 +32,14 @@ public enum SettleStatusEnum {
     public static List<Integer> unSettled() {
         return List.of(INIT.value, ACCUMULATING.value, RISKMANAGEMENT.value, CLEARING.value, WAITING_SETTLE_TRADE_FEE.value, WAITING_SETTLE_INSTALLMENT_FEE.value, WAITING_SETTLE_TAX_FEE.value, WAITING_SETTLE_NET.value);
     }
+
+    public static SettleStatusEnum valueOf(int value) {
+        for (SettleStatusEnum statusEnum : SettleStatusEnum.values()) {
+            if (statusEnum.value == value) {
+                return statusEnum;
+            }
+        }
+        return null;
+    }
+
 }
