@@ -66,4 +66,22 @@
     where user_id = #{entity.userId} and detail_id = #{entity.detailId}
     and user_trade_type = #{entity.userTradeType} and state = #{state}
     </update>
+
+<select id="selectDetails" resultType="com.example.settlement.settle.infra.db.entity.SettleDetailEntity">
+    select * from settle_detail
+    where user_id = #{userId} and settle_id = #{settleId}
+</select>
+
+<select id="selectUnbindDetails" resultType="com.example.settlement.settle.infra.db.entity.SettleDetailEntity">
+    select * from settle_detail
+    where user_id = #{userId} user_product = #{userProduct} and settle_id = ''
+</select>
+
+<update id="updateSettleId">
+    update settle_detail set settle_id = #{settleId}
+    where user_id = #{userId} and detail_id in
+    <foreach collection="detailIds" item="detailId" open="(" separator="," close=")">
+        #{detailId}
+    </update>
+    and settle_id = ''
 </mapper>

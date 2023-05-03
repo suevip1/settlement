@@ -11,7 +11,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum SummaryStateEnum {
-    ACCUMULATING(0, "累加流程中"),
+    BINDING(0, "绑定详情单流程中"),
     CLEARING(1, "清算流程中");
     private int value;
     private String desc;

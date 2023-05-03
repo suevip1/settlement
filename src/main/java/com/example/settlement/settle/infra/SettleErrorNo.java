@@ -16,4 +16,7 @@ public interface SettleErrorNo {
     ErrorNo SETTLE_UNSUPPORTED_DELAY_MODE = new ErrorNo(10003, "不支持的延迟结算模式");
     ErrorNo SETTLE_HOLIDAY_ERROR = new ErrorNo(10004, "节假日配置错误");
     ErrorNo LAST_BILL_IS_BEING_AUDITED = new ErrorNo(10005, "上一个结算单正在审核中");
+    ErrorNo SETTLE_STATUS_ERROR = new ErrorNo(10006, "结算单状态错误");
+    ErrorNo DETAIL_INFO_EMPTY = new ErrorNo(10007, "结算详情单为空");
+    ErrorNo DETAIL_INFO_STATE_ERROR = new ErrorNo(10008, "结算详情单状态错误");
 }

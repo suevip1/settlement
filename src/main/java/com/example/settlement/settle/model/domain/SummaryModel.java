@@ -1,9 +1,12 @@
-package com.example.settlement.settle.model.valueobj;
+package com.example.settlement.settle.model.domain;
 
 import com.example.settlement.clear.model.ClearingSetting;
 import com.example.settlement.common.exceptions.ErrorNoException;
 import com.example.settlement.settle.infra.SettleErrorNo;
 import com.example.settlement.settle.model.event.SummaryStarted;
+import com.example.settlement.settle.model.valueobj.SettleConfig;
+import com.example.settlement.settle.model.valueobj.SummaryId;
+import com.example.settlement.settle.model.valueobj.SummaryInfo;
 
 import java.util.Date;
 import java.util.Map;

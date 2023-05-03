@@ -249,7 +249,7 @@ public class ClearingService {
         }
         settleDetailEntity.setUpdateTime(new Date());
         // 累加同类型的多笔交易（支付、退款）
-        Assert.isTrue(detailMapper.updateFee(settleDetailEntity, SummaryStateEnum.ACCUMULATING.getValue()) == 1, ClearingErrorNo.CLEAR_PROCESS_DB_UPDATE_FAIL.toString());
+        Assert.isTrue(detailMapper.updateFee(settleDetailEntity, SummaryStateEnum.BINDING.getValue()) == 1, ClearingErrorNo.CLEAR_PROCESS_DB_UPDATE_FAIL.toString());
         // 存储该笔交易的各项费用索引，为后续交易重试做幂等校验
         createTradeFeeClearIndex(entity, detailId);
         createInstallmentFeeClearIndex(entity, detailId);

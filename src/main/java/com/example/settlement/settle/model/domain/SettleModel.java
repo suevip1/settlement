@@ -1,4 +1,4 @@
-package com.example.settlement.settle.model.valueobj;
+package com.example.settlement.settle.model.domain;
 
 import com.example.settlement.clear.model.ClearingSetting;
 import com.example.settlement.common.enums.UserProductTypeEnum;
@@ -9,6 +9,9 @@ import com.example.settlement.settle.infra.SettleErrorNo;
 import com.example.settlement.settle.infra.enums.SettleStatusEnum;
 import com.example.settlement.settle.infra.enums.SettleTypeEnum;
 import com.example.settlement.settle.model.event.SettleBillInited;
+import com.example.settlement.settle.model.valueobj.SettleBillInfo;
+import com.example.settlement.settle.model.valueobj.SettleConfig;
+import com.example.settlement.settle.model.valueobj.SettleKey;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 

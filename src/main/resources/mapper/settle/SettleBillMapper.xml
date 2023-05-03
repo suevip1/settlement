@@ -25,4 +25,28 @@
 
         </trim>
 </insert>
+
+<select id="selectAllSettleId" resultType="java.lang.String">
+    select settle_id from settlement_bill
+    where user_id = #{userId} and settle_status in
+    <foreach collection="statuses" item="status" index="index" open="(" separator="," close=")">
+        #{status}
+    </select>
+
+<select id="selectOne" resultType="com.example.settlement.settle.infra.db.entity.SettleBillEntity">
+    select * from settlement_bill
+    where user_id = #{userId} and settle_id = #{settleId}
+</select>
+
+<update id="updateSelective">
+update settlement_bill
+    <set>
+        <if test="bill.userId != null">user_id = #{bill.userId},</if>
+        <if test="bill.userType != null">user_type = #{bill.userType},</if>
+        <if test="bill.configId != null">config_id = #{bill.configId},</if>
+        <if test="bill.settleId != null">settle_id = #{bill.settleId},</if>
+    </set>
+    version = version + 1
+    where user_id = {userId} and settle_id = #{settleId} and version = #{version}
+</update>
 </mapper>

@@ -3,17 +3,25 @@ package com.example.settlement.settle;
 import com.example.settlement.common.event.UnexpectedEvent;
 import com.example.settlement.common.exceptions.ErrorNoException;
 import com.example.settlement.settle.infra.SettleErrorNo;
+import com.example.settlement.settle.model.domain.SettleBindModel;
+import com.example.settlement.settle.model.domain.SettleModel;
+import com.example.settlement.settle.model.domain.SummaryModel;
 import com.example.settlement.settle.model.event.SettleBillInited;
+import com.example.settlement.settle.model.event.SettleBindStarted;
 import com.example.settlement.settle.model.event.SettleEventHandler;
 import com.example.settlement.settle.model.event.SummaryStarted;
 import com.example.settlement.settle.model.valueobj.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -28,6 +36,8 @@ public class SettleService {
     private SettleConfigRepo configRepo;
     @Resource
     private SettleEventHandler eventHandler;
+    @Resource
+    private SettleQueryRepo settleQueryRepo;
 
     @PostConstruct
     public void init() {
@@ -66,6 +76,7 @@ public class SettleService {
 
     public SettleId createSettleId(Long userId, Integer userProduct, Date transTime) {
         SettleModel model = configRepo.getUserSettleModel(userId);
+        // 从缓存中获取当前结算单
         String settleId = model.getSettleId(userProduct, transTime);
         if (settleId != null) {
             return new SettleId(settleId);
@@ -80,4 +91,21 @@ public class SettleService {
             return new SettleId(null);
         }
     }
+
+    public Pair<Boolean, UnexpectedEvent> bindSummaryDetail(Long userId, String settleId) {
+        SettleBindModel model = settleQueryRepo.getSettleBindModel(userId, settleId);
+        List<DetailInfo> detailInfoList = settleQueryRepo.getUnbindDetails(userId, model.getEntity().getSettleType());
+        detailInfoList = detailInfoList.stream()
+                .filter(detailInfo -> detailInfo.getSummaryTime().before(model.getEntity().getLiquidEndTime())).toList();
+        if (CollectionUtils.isNotEmpty(detailInfoList)) {
+            Pair<SettleBindStarted, ? extends UnexpectedEvent> result = model.startBindDetails(detailInfoList);
+            if (result.getLeft() == null) {
+                return Pair.of(false, result.getRight());
+            }
+            eventHandler.process(result.getLeft());
+            model.refresh(result.getLeft());
+        }
+        return Pair.of(true, null);
+    }
+
 }

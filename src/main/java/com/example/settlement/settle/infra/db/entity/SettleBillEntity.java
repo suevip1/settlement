@@ -21,7 +21,7 @@ public class SettleBillEntity {
     private String configId; // 结算配置id
     private String settleId;
     private Integer settleMode;
-    private Integer settleType; // 收单产品金额结算、代付产品净额结算
+    private Integer settleType; // 对应于商户产品类型 userProduct：收单产品金额结算、代付产品净额结算
     private Integer settleCycle;
     private Date settleTime;
     private Long totalCount; // 总交易笔数

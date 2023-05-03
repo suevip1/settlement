@@ -15,7 +15,7 @@ import java.util.List;
 public enum SettleStatusEnum {
 
     INIT(0, "初始化", false),
-    ACCUMULATING(1, "累计中", false),
+    BINDING(1, "绑定中", false),
     RISKMANAGEMENT(2, "风控中", false),
     CLEARING(3, "清算中", false), // 小清算，只做轧差，完成后操作账户
     WAITING_SETTLE_TRADE_FEE(4, "等待结算交易手续费", true),
@@ -30,7 +30,7 @@ public enum SettleStatusEnum {
 
 
     public static List<Integer> unSettled() {
-        return List.of(INIT.value, ACCUMULATING.value, RISKMANAGEMENT.value, CLEARING.value, WAITING_SETTLE_TRADE_FEE.value, WAITING_SETTLE_INSTALLMENT_FEE.value, WAITING_SETTLE_TAX_FEE.value, WAITING_SETTLE_NET.value);
+        return List.of(INIT.value, BINDING.value, RISKMANAGEMENT.value, CLEARING.value, WAITING_SETTLE_TRADE_FEE.value, WAITING_SETTLE_INSTALLMENT_FEE.value, WAITING_SETTLE_TAX_FEE.value, WAITING_SETTLE_NET.value);
     }
 
     public static SettleStatusEnum valueOf(int value) {
