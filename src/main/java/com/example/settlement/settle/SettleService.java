@@ -3,13 +3,13 @@ package com.example.settlement.settle;
 import com.example.settlement.common.event.UnexpectedEvent;
 import com.example.settlement.common.exceptions.ErrorNoException;
 import com.example.settlement.settle.infra.SettleErrorNo;
-import com.example.settlement.settle.model.domain.SettleBindModel;
-import com.example.settlement.settle.model.domain.SettleModel;
+import com.example.settlement.settle.model.event.*;
+import com.example.settlement.settle.model.event.handler.IHandleable;
+import com.example.settlement.settle.model.event.handler.SettleProcessInit;
+import com.example.settlement.settle.model.domain.BillModel;
+import com.example.settlement.settle.model.domain.GenerateBillModel;
 import com.example.settlement.settle.model.domain.SummaryModel;
-import com.example.settlement.settle.model.event.SettleBillInited;
-import com.example.settlement.settle.model.event.SettleBindStarted;
-import com.example.settlement.settle.model.event.SettleEventHandler;
-import com.example.settlement.settle.model.event.SummaryStarted;
+import com.example.settlement.settle.model.event.handler.SettleEventHandler;
 import com.example.settlement.settle.model.valueobj.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -17,11 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -75,7 +73,7 @@ public class SettleService {
     }
 
     public SettleId createSettleId(Long userId, Integer userProduct, Date transTime) {
-        SettleModel model = configRepo.getUserSettleModel(userId);
+        GenerateBillModel model = configRepo.getUserSettleModel(userId);
         // 从缓存中获取当前结算单
         String settleId = model.getSettleId(userProduct, transTime);
         if (settleId != null) {
@@ -93,7 +91,7 @@ public class SettleService {
     }
 
     public Pair<Boolean, UnexpectedEvent> bindSummaryDetail(Long userId, String settleId) {
-        SettleBindModel model = settleQueryRepo.getSettleBindModel(userId, settleId);
+        BillModel model = settleQueryRepo.getSettleBindModel(userId, settleId);
         List<DetailInfo> detailInfoList = settleQueryRepo.getUnbindDetails(userId, model.getEntity().getSettleType());
         detailInfoList = detailInfoList.stream()
                 .filter(detailInfo -> detailInfo.getSummaryTime().before(model.getEntity().getLiquidEndTime())).toList();
@@ -108,4 +106,40 @@ public class SettleService {
         return Pair.of(true, null);
     }
 
+
+    /**
+     * 尝试完成商户结算单，进入结算流程（init -> bind -> 清算 -> 待结算 -> 结算）
+     * 幂等操作，可重复调用，有可能被异常中断，扫表重新触发
+     * @param userId
+     * @param settleId
+     * @return
+     */
+    public Pair<Boolean, UnexpectedEvent> tryFinishSettleBill(Long userId, String settleId) {
+
+        return null;
+    }
+
+    private IHandleable<GenerateBillModel> initProcess(boolean forceComplete) {
+        // 流程初始化
+        SettleProcessInit init = new SettleProcessInit();
+        // 流程绑定
+        SettleProcessBinding bind = new SettleProcessBinding(forceComplete);
+        // 风控检查
+        SettleProcessRiskManage riskManage = new SettleProcessRiskManage();
+        // 清算
+        SettleProcessClear clear = new SettleProcessClear();
+        // 待结算交易手续费
+        SettleProcessTradeFee tradeFee = new SettleProcessTradeFee();
+        // 待结算分期手续费
+        SettleProcessInstalmentFee instalmentFee = new SettleProcessInstalmentFee();
+        // 待结算税费
+        SettleProcessTaxFee taxFee = new SettleProcessTaxFee();
+        // 待结算净额
+        SettleProcessNetFee netFee = new SettleProcessNetFee(forceComplete);
+        // 结算完成
+        SettleProcessComplete complete = new SettleProcessComplete();
+
+        init.setNext(bind.setNext(riskCheck.setNext(clear.setNext(tradeFee.setNext(instalmentFee.setNext(taxFee.setNext(netFee.setNext(complete))))))));
+        return init;
+    }
 }

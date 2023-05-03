@@ -18,11 +18,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.*;
 
 /**
- *
+ * 创建结算单模型
  * @author yangwu_i
  * @date 2023/5/1 11:09
  */
-public record SettleModel(
+public record GenerateBillModel(
         long userId,
         Map<String, SettleConfig> configs, // 当前商户的所有结算配置
         Map<SettleKey, SettleBillInfo> bills // 所有未结算完的结算单

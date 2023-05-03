@@ -17,4 +17,6 @@ public interface SettleConfigMapper {
     List<SettlementConfigEntity> selectByUserId(Long userId);
 
     List<Long> selectActiveUsers();
+
+    SettlementConfigEntity selectConfig(Long userId, int productType);
 }

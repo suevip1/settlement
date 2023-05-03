@@ -29,4 +29,6 @@ public interface SettleDetailMapper {
     List<SettleDetailEntity> selectUnbindDetails(Long userId, Integer userProduct);
 
     int updateSettleId(Long userId, String settleId, List<String> detailIds);
+
+    int updateStateOfDetails(Long userId, String settleId, List<String> detailIds, int status);
 }

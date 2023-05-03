@@ -1,5 +1,7 @@
 package com.example.settlement.settle.infra.utils;
 
+import com.example.settlement.settle.infra.job.SettleBillBindHandler;
+import com.example.settlement.settle.infra.job.SettleProcessHandler;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import java.util.concurrent.ExecutorService;
@@ -19,5 +21,15 @@ public interface ExecutorUtils {
     int WC_RATE_BILL_GEN = 10 / 3;
     ExecutorService SETTLE_BILL_GEN = new ThreadPoolExecutor(CPU_COUNT, CPU_COUNT * (1 + WC_RATE_BILL_GEN), 10L,
             TimeUnit.MINUTES, new LinkedBlockingQueue<>(10240), new ThreadFactoryBuilder().setNameFormat("settle_bill_gen_pool_%d").build(),
+            new ThreadPoolExecutor.AbortPolicy());
+
+    int WC_RATE_BILL_BIND = 10 / 3;
+    ExecutorService SETTLE_BILL_BIND_DETAIL = new ThreadPoolExecutor(CPU_COUNT, CPU_COUNT * (1 + WC_RATE_BILL_BIND), 10L,
+            TimeUnit.MINUTES, new LinkedBlockingQueue<>(10240), new ThreadFactoryBuilder().setNameFormat("settle_bill_bind_detail_pool_%d").build(),
+            new ThreadPoolExecutor.AbortPolicy());
+
+    int WC_RATE_BILL_TRY_FINISH = 10 / 3;
+    ExecutorService SETTLE_BILL_TRY_FINISH = new ThreadPoolExecutor(CPU_COUNT, CPU_COUNT * (1 + WC_RATE_BILL_TRY_FINISH), 10L,
+            TimeUnit.MINUTES, new LinkedBlockingQueue<>(10240), new ThreadFactoryBuilder().setNameFormat("settle_bill_try_finish_pool_%d").build(),
             new ThreadPoolExecutor.AbortPolicy());
 }

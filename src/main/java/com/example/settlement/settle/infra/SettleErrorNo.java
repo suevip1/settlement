@@ -19,4 +19,11 @@ public interface SettleErrorNo {
     ErrorNo SETTLE_STATUS_ERROR = new ErrorNo(10006, "结算单状态错误");
     ErrorNo DETAIL_INFO_EMPTY = new ErrorNo(10007, "结算详情单为空");
     ErrorNo DETAIL_INFO_STATE_ERROR = new ErrorNo(10008, "结算详情单状态错误");
+    ErrorNo COMPLETE_CLEAR_DETAILS_IS_NULL = new ErrorNo(10009, "完成清算的详情单为空");
+    ErrorNo COMPLETE_CLEAR_SETTLE_STATUS_ERROR = new ErrorNo(10010, "完成清算的结算单状态错误");
+    ErrorNo COMPLETE_CLEAR_DETAILS_SIZE_ERROR = new ErrorNo(10011, "完成清算的详情单数量错误，传入详情单数据和已存在的详情单数量不一致");
+    ErrorNo USER_TRADE_TYPE_NOT_EXISTS = new ErrorNo(10012, "用户交易类型不存在");
+    ErrorNo NOT_TIME_TO_CLEARING = new ErrorNo(10013, "未到结算时间");
+    ErrorNo RISK_MANAGE_SETTLE_STATUS_ERROR = new ErrorNo(10014, "风控管理结算单状态错误");
+    ErrorNo RISK_MANAGE_WAIT = new ErrorNo(10015, "当前风控拦截，不可进行清算");
 }

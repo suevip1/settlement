@@ -24,11 +24,20 @@ public class SettleBillEntity {
     private Integer settleType; // 对应于商户产品类型 userProduct：收单产品金额结算、代付产品净额结算
     private Integer settleCycle;
     private Date settleTime;
+    private Long totalAmount; // 总交易金额
     private Long totalCount; // 总交易笔数
     private Long totalNetAmount; // 总交易净额
     private Long totalNetCount; // 总净得交易笔数
     private Long totalFeeAmount; // 总交易手续费
     private Long totalFeeCount; // 总手续费笔数
+    private Long totalProcessedTradeFeeAmount; // 总已处理交易手续费
+    private Long totalUnProcessedTradeFeeAmount; // 总未处理交易手续费
+    private Long totalProcessedInstallmentFeeAmount; // 总已处理分期手续费
+    private Long totalUnProcessedInstallmentFeeAmount; // 总未处理分期手续费
+    private Long totalProcessedTaxFeeAmount; // 总已处理税费
+    private Long totalUnProcessedTaxFeeAmount; // 总未处理税费
+    private Long totalSettledNetAmount; // 总已结算净额
+    private Long totalUnSettledNetAmount; // 总未结算净额
     private String currency;
     private Date liquidStartTime;
     private Date liquidEndTime;

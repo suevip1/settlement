@@ -7,7 +7,7 @@ import com.example.settlement.settle.infra.db.entity.SettleBillEntity;
 import com.example.settlement.settle.infra.db.entity.SettleDetailEntity;
 import com.example.settlement.settle.infra.db.mapper.SettleBillMapper;
 import com.example.settlement.settle.infra.db.mapper.SettleDetailMapper;
-import com.example.settlement.settle.model.domain.SettleBindModel;
+import com.example.settlement.settle.model.domain.BillModel;
 import com.example.settlement.settle.model.valueobj.DetailInfo;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
@@ -46,7 +46,7 @@ public class SettleQueryRepo {
         }
     }
 
-    public SettleBindModel getSettleBindModel(Long userId, String settleId) {
+    public BillModel getSettleBindModel(Long userId, String settleId) {
         SettleBillEntity billEntity = billMapper.selectOne(userId, settleId);
         if (billEntity == null) {
             return null;
@@ -55,7 +55,7 @@ public class SettleQueryRepo {
         List<SettleDetailEntity> details = detailMapper.selectDetails(userId, settleId);
         List<DetailInfo> detailInfos = details.stream().map(this::toDetailInfo).collect(Collectors.toList());
         // todo: 获取税费配置
-        return new SettleBindModel(billEntity, detailInfos);
+        return new BillModel(billEntity, detailInfos);
     }
 
     private DetailInfo toDetailInfo(SettleDetailEntity entity) {

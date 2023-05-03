@@ -27,8 +27,8 @@ public class SettleDetailEntity implements Serializable {
     private Long totalAmount; // 总交易金额
 
     // 下面费用类型对应 FeeTypeEnum 中的 8 个枚举值
-    private Long totalProcessedFee; // 总已处理交易手续费
-    private Long totalUnProcessedFee; // 总未处理交易手续费
+    private Long totalProcessedTradeFee; // 总已处理交易手续费
+    private Long totalUnProcessedTradeFee; // 总未处理交易手续费
     private Long totalProcessedInstallmentFee; // 总已处理分期手续费
     private Long totalUnProcessedInstallmentFee; // 总未处理分期手续费
     private Long totalProcessedTaxFee; // 总已处理税费

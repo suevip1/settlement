@@ -13,49 +13,49 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
- * 将详情单绑定到汇总单
- * 每小时检查当前结算单，1.直接进行结算主流程，2.不满足结算条件，进行汇总结算单的处理
+ * 定时结算，将汇总详情单汇总到结算单
  * @author yangwu_i
- * @date 2023/5/2 12:43
+ * @date 2023/5/3 15:46
  */
 @Slf4j
 @Service
-public class SettleBillBindHandler {
+public class SettleProcessHandler {
 
     @Resource
     private ConfigMaintainService configMaintainService;
     @Resource
     private SettleBillMapper settleBillMapper;
+    
     @Resource
     private SettleService settleService;
-
-    @XxlJob("settle_bill_attach")
+    @XxlJob("settle_bill_finish")
     public void execute() {
         int shardIndex = XxlJobHelper.getShardIndex();
         int shardTotal = XxlJobHelper.getShardTotal();
-        List<Long> userIds = configMaintainService.selectActiveUsers();
-        log.info("settle_bill_attach: shardIndex={}, shardTotal={}, userIds={}", shardIndex, shardTotal, userIds);
+        List<Long> userIdList =  configMaintainService.selectActiveUsers();
+        log.info("settle_bill_finish, shardIndex:{}, shardTotal:{}, userIdList:{}", shardIndex, shardTotal, userIdList);
 
-        for (Long userId : userIds) {
+        for (Long userId : userIdList) {
             if (userId % shardTotal == shardIndex) {
-                List<String> settleIds = settleBillMapper.selectAllSettleId(userId, SettleStatusEnum.unSettled());
-                log.info("settle_bill_attach: userId={}, settleIds={}", userId, settleIds);
-
-                settleIds.forEach( settleId -> {
-                    ExecutorUtils.SETTLE_BILL_BIND_DETAIL.execute(() -> {
+                List<String> settleIdList = settleBillMapper.selectExpiredSettleBillIds(userId, new Date(), SettleStatusEnum.unSettled());
+                log.info("settle_bill_finish, userId:{}, settleIdList:{}", userId, settleIdList);
+                
+                settleIdList.forEach(settleId -> {
+                    ExecutorUtils.SETTLE_BILL_TRY_FINISH.execute(() -> {
                         try {
-                            Pair<Boolean, UnexpectedEvent> result = settleService.bindSummaryDetail(userId, settleId);
+                            Pair<Boolean, UnexpectedEvent> result = settleService.tryFinishSettleBill(userId, settleId);
                             if (result.getLeft()) {
-                                log.info("settle_bill_attach succeed: userId={}, settleId={}", userId, settleId);
+                                log.info("settle_bill_finish succeed: userId={}, settleId={}", userId, settleId);
                             } else {
-                                log.error("settle_bill_attach failed: userId={}, settleId={}, error={}", userId, settleId, result.getRight());
+                                log.error("settle_bill_finish fail: userId={}, settleId={}, error={}", userId, settleId, result.getRight());
                             }
-                        } catch (Throwable e) {
+                        }catch (Throwable e) {
                             log.info("", e);
-                            log.error("settle_bill_attach fail: userId={}, settleId={}, error={}", userId, settleId, e);
+                            log.error("settle_bill_finish fail: userId={}, settleId={}, error={}", userId, settleId, e);
                         }
                     });
                 });

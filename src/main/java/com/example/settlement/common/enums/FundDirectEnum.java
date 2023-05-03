@@ -12,7 +12,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum FundDirectEnum {
     DIRECT_PAYMENT(1, "正向交易"),
-    DIRECT_REFUND(2, "逆向交易");
+    // 费项方向，扣除B商户的钱
+    DIRECT_DEDUCTION(-1, "直接扣除");
     private final int value;
     private final String desc;
 }

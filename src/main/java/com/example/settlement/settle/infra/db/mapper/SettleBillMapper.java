@@ -5,6 +5,7 @@ import com.example.settlement.settle.model.valueobj.SettleBillInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,4 +27,7 @@ public interface SettleBillMapper {
     SettleBillEntity selectOne(Long userId, String settleId);
 
     int updateSelective(SettleBillEntity bill, Long userId, String settleId, Integer version);
+
+    // 返回所有需要进行结算的结算单单号
+    List<String> selectExpiredSettleBillIds(Long userId, Date liquidEndTime, List<Integer> statuses);
 }

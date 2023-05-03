@@ -10,7 +10,7 @@ import com.example.settlement.settle.infra.db.entity.SettleDetailEntity;
 import com.example.settlement.settle.infra.db.mapper.SettleDetailMapper;
 import com.example.settlement.settle.infra.db.mapper.SettleBillMapper;
 import com.example.settlement.settle.infra.enums.SettleStatusEnum;
-import com.example.settlement.settle.model.domain.SettleModel;
+import com.example.settlement.settle.model.domain.GenerateBillModel;
 import com.example.settlement.settle.model.domain.SummaryModel;
 import com.example.settlement.settle.model.valueobj.*;
 import com.google.common.collect.Maps;
@@ -38,7 +38,7 @@ public class SettleConfigRepo {
     @Resource
      private SettleDetailMapper settleDetailMapper;
 
-    public SettleModel getUserSettleModel(Long userId) {
+    public GenerateBillModel getUserSettleModel(Long userId) {
         // 1. 获取当前生效的 settleConfig
         List<SettlementConfigEntity> configs = configMaintainService.getSettleConfig(userId);
         if (CollectionUtils.isEmpty(configs)) {
@@ -60,7 +60,7 @@ public class SettleConfigRepo {
         bills.forEach(bill -> refer.put(
                 new SettleKey(bill.settleTime(), configMap.get(bill.configId()).setting().getUserProduct()),
                 bill));
-        return new SettleModel(userId, configMap, refer);
+        return new GenerateBillModel(userId, configMap, refer);
     }
 
     public SummaryModel getUserSummaryModel(Long userId) {

@@ -18,6 +18,7 @@ public class DetailInfo {
         private Date summaryTime;
         private Integer state;
         private Integer transType;
+        private Long riskCount; // 风控结果总数
         private Long totalTradeCount;
 }
 

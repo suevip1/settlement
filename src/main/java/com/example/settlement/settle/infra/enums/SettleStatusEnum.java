@@ -16,7 +16,7 @@ public enum SettleStatusEnum {
 
     INIT(0, "初始化", false),
     BINDING(1, "绑定中", false),
-    RISKMANAGEMENT(2, "风控中", false),
+    RISKMANAGEMENT(2, "风控中", false), // 风险控制中，若有风险交易，则会限制结算单流转到清算状态，继续停留在绑定状态
     CLEARING(3, "清算中", false), // 小清算，只做轧差，完成后操作账户
     WAITING_SETTLE_TRADE_FEE(4, "等待结算交易手续费", true),
     WAITING_SETTLE_INSTALLMENT_FEE(5, "等待结算分期手续费", true),
