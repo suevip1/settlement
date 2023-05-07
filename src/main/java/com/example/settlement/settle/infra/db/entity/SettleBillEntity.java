@@ -44,6 +44,7 @@ public class SettleBillEntity {
     private Date settleStartTime;
     private Date settleEndTime;
     private Integer settleStatus;
+    private Integer withdrawStatus;
     private String remark;
     private Integer version; // 乐观锁
     private static final long serialVersionUID = 1L;

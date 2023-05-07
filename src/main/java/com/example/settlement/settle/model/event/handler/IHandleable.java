@@ -9,4 +9,5 @@ import com.example.settlement.common.event.UnexpectedEvent;
  */
 public interface IHandleable<T> {
     UnexpectedEvent handle(T obj);
+    IHandleable<T> setNext(IHandleable<T> next);
 }

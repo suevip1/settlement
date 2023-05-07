@@ -2,30 +2,26 @@ package com.example.settlement.settle.model.event.handler;
 
 import com.example.settlement.common.event.UnexpectedEvent;
 import com.example.settlement.settle.model.domain.BillModel;
-import com.example.settlement.settle.model.event.SettleClearCompleted;
-import com.google.common.collect.Lists;
+import com.example.settlement.settle.model.event.SettleBillBound;
+import com.example.settlement.settle.model.event.handler.IHandleable;
+import com.example.settlement.settle.model.event.handler.SettleEventHandler;
 import jakarta.annotation.Resource;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
- *
+ * 结算单风控拦截
  * @author yangwu_i
- * @date 2023/5/3 16:52
+ * @date 2023/5/3 22:09
  */
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class SettleProcessInit extends AbstractHandler<BillModel> {
+public class SettleProcessRiskManage extends AbstractHandler<BillModel> {
     @Resource
     private SettleEventHandler repo;
     @Override
     public UnexpectedEvent handle(BillModel model) {
-        if (model.isInit()) {
-            // init 状态转为 clear 结束（肯定没有单子，直接到清算结束）
-            Pair<SettleClearCompleted, UnexpectedEvent> result = model.completeClear(Lists.newLinkedList());
+        if (model.isRisk()) {
+            Pair<SettleBillBound, UnexpectedEvent> result = model.riskBeforeClear();
             if (result.getLeft() == null) {
                 return result.getRight();
             }

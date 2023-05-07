@@ -1,4 +1,4 @@
-package com.example.settlement.settle.model.event;
+package com.example.settlement.settle.model.event.handler;
 
 import com.example.settlement.common.enums.UserProductTypeEnum;
 import com.example.settlement.common.event.ErrorNoUnexpectedEvent;
@@ -8,10 +8,12 @@ import com.example.settlement.config.mapper.SettleConfigMapper;
 import com.example.settlement.settle.infra.SettleErrorNo;
 import com.example.settlement.settle.infra.enums.SettleRiskStrategyEnum;
 import com.example.settlement.settle.model.domain.BillModel;
+import com.example.settlement.settle.model.event.SettleBillBound;
+import com.example.settlement.settle.model.event.SettleRiskManaged;
 import com.example.settlement.settle.model.event.handler.IHandleable;
 import com.example.settlement.settle.model.event.handler.SettleEventHandler;
 import jakarta.annotation.Resource;
-import lombok.AllArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
@@ -19,8 +21,8 @@ import org.apache.commons.lang3.tuple.Pair;
  * @author yangwu_i
  * @date 2023/5/3 21:14
  */
-public class SettleProcessBinding implements IHandleable<BillModel> {
-
+@Setter
+public class SettleProcessBinding extends AbstractHandler<BillModel> {
     @Resource
     private SettleConfigMapper settleConfigMapper;
     @Resource
@@ -53,10 +55,8 @@ public class SettleProcessBinding implements IHandleable<BillModel> {
                 repo.process(result.getLeft());
                 model.refresh(result.getLeft());
             }
-
-
         }
-        return null;
+        return next.handle(model);
     }
 
     private boolean needRiskManage(BillModel model) {

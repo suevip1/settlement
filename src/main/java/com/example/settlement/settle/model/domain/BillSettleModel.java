@@ -9,6 +9,8 @@ import com.example.settlement.settle.infra.SettleErrorNo;
 import com.example.settlement.settle.infra.enums.SettleStatusEnum;
 import com.example.settlement.settle.infra.enums.SettleTypeEnum;
 import com.example.settlement.settle.model.event.SettleBillInited;
+import com.example.settlement.settle.model.event.SettleBindRestart;
+import com.example.settlement.settle.model.event.SettleClearCompleted;
 import com.example.settlement.settle.model.valueobj.SettleBillInfo;
 import com.example.settlement.settle.model.valueobj.SettleConfig;
 import com.example.settlement.settle.model.valueobj.SettleKey;
@@ -22,7 +24,7 @@ import java.util.*;
  * @author yangwu_i
  * @date 2023/5/1 11:09
  */
-public record GenerateBillModel(
+public record BillSettleModel(
         long userId,
         Map<String, SettleConfig> configs, // 当前商户的所有结算配置
         Map<SettleKey, SettleBillInfo> bills // 所有未结算完的结算单
@@ -100,4 +102,23 @@ public record GenerateBillModel(
                 })
                 .orElse(false);
     }
+
+    public SettleBindRestart restartIfNeed(SettleClearCompleted event) {
+        SettleConfig config = configs.get(event.getConfigId());
+        if (config.setting().getUserProduct() == UserProductTypeEnum.PAY_OUT.getValue() ||
+                config.reachMinSettleAmount(event.getTotalTradeNetAmount())) {
+            return null;
+        }
+        return SettleBindRestart.builder()
+                .userId(event.getUserId())
+                .settleId(event.getSettleId())
+                .version(event.getVersion())
+                .detailIds(event.getDetailIds())
+                // 以清算结算时间计算新的结算时间
+                .updatedSettleTime(config.getSettleTime(event.getLiquidEndTime()))
+                // 以清算结算时间计算新的结算时间
+                .updatedLiquidEndTime(config.getLiquidEndTime(event.getLiquidEndTime()))
+                .build();
+    }
+
 }

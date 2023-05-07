@@ -12,6 +12,7 @@ import com.example.settlement.settle.model.valueobj.DetailInfo;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,12 +60,20 @@ public class SettleQueryRepo {
     }
 
     private DetailInfo toDetailInfo(SettleDetailEntity entity) {
-        return new DetailInfo(entity.getDetailId(), entity.getSummaryTime(), entity.getState(), entity.getUserTradeType(), entity.getTotalCount());
+        return new DetailInfo(entity.getDetailId(), entity.getSummaryTime(), entity.getState(), entity.getUserTradeType(), entity.getInitiationCount(),entity.getTotalCount());
     }
 
     public List<DetailInfo> getUnbindDetails(Long userId, Integer userProduct) {
         return detailMapper.selectUnbindDetails(userId, userProduct).stream()
-                .map(detail -> new DetailInfo(detail.getDetailId(), detail.getSummaryTime(), detail.getState(), detail.getUserTradeType(), detail.getTotalCount()))
+                .map(detail -> new DetailInfo(detail.getDetailId(), detail.getSummaryTime(), detail.getState(), detail.getUserTradeType(), detail.getInitiationCount(), detail.getTotalCount()))
                 .collect(Collectors.toList());
+    }
+
+    public List<SettleDetailEntity> getDetailInfos(Long userId, String settleId) {
+        List<SettleDetailEntity> detailEntities = detailMapper.selectDetails(userId, settleId);
+        if (CollectionUtils.isEmpty(detailEntities)) {
+            return Lists.newArrayList();
+        }
+        return detailEntities;
     }
 }

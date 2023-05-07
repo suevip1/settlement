@@ -229,4 +229,8 @@ public record SettleConfig(Instant SETTLE_ZERO, ChronoUnit TRADE_CLEARING_SUMMAR
             default -> throw new ErrorNoException(SettleErrorNo.SETTLE_UNSUPPORTED_DELAY_MODE, "不支持的延期计算模式");
         }
     }
+
+    public boolean reachMinSettleAmount(Long totalTradeNetAmount) {
+       return totalTradeNetAmount >= setting.getMinSettleAmount();
+    }
 }

@@ -4,12 +4,13 @@ import com.example.settlement.common.event.UnexpectedEvent;
 import com.example.settlement.common.exceptions.ErrorNoException;
 import com.example.settlement.settle.infra.SettleErrorNo;
 import com.example.settlement.settle.model.event.*;
-import com.example.settlement.settle.model.event.handler.IHandleable;
-import com.example.settlement.settle.model.event.handler.SettleProcessInit;
+import com.example.settlement.settle.model.event.handler.SettleProcessNetFee;
+import com.example.settlement.settle.model.event.handler.SettleProcessTaxFee;
+import com.example.settlement.settle.model.event.handler.*;
 import com.example.settlement.settle.model.domain.BillModel;
-import com.example.settlement.settle.model.domain.GenerateBillModel;
+import com.example.settlement.settle.model.domain.BillSettleModel;
 import com.example.settlement.settle.model.domain.SummaryModel;
-import com.example.settlement.settle.model.event.handler.SettleEventHandler;
+import com.example.settlement.settle.model.event.handler.SettleProcessComplete;
 import com.example.settlement.settle.model.valueobj.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -73,7 +74,7 @@ public class SettleService {
     }
 
     public SettleId createSettleId(Long userId, Integer userProduct, Date transTime) {
-        GenerateBillModel model = configRepo.getUserSettleModel(userId);
+        BillSettleModel model = configRepo.getUserSettleModel(userId);
         // 从缓存中获取当前结算单
         String settleId = model.getSettleId(userProduct, transTime);
         if (settleId != null) {
@@ -119,27 +120,26 @@ public class SettleService {
         return null;
     }
 
-    private IHandleable<GenerateBillModel> initProcess(boolean forceComplete) {
+    private IHandleable<BillModel> initProcess(boolean forceComplete) {
         // 流程初始化
-        SettleProcessInit init = new SettleProcessInit();
+        IHandleable<BillModel> init = new SettleProcessInit();
         // 流程绑定
-        SettleProcessBinding bind = new SettleProcessBinding(forceComplete);
+        IHandleable<BillModel> bind = new SettleProcessBinding(forceComplete);
         // 风控检查
-        SettleProcessRiskManage riskManage = new SettleProcessRiskManage();
+        IHandleable<BillModel> riskManage = new SettleProcessRiskManage();
         // 清算
-        SettleProcessClear clear = new SettleProcessClear();
+        IHandleable<BillModel> clear = new SettleProcessClear();
         // 待结算交易手续费
-        SettleProcessTradeFee tradeFee = new SettleProcessTradeFee();
+        IHandleable<BillModel> tradeFee = new SettleProcessTradeFee();
         // 待结算分期手续费
-        SettleProcessInstalmentFee instalmentFee = new SettleProcessInstalmentFee();
+        IHandleable<BillModel> instalmentFee = new SettleProcessInstalmentFee();
         // 待结算税费
-        SettleProcessTaxFee taxFee = new SettleProcessTaxFee();
+        IHandleable<BillModel> taxFee = new SettleProcessTaxFee();
         // 待结算净额
-        SettleProcessNetFee netFee = new SettleProcessNetFee(forceComplete);
+        IHandleable<BillModel> netFee = new SettleProcessNetFee(forceComplete);
         // 结算完成
-        SettleProcessComplete complete = new SettleProcessComplete();
-
-        init.setNext(bind.setNext(riskCheck.setNext(clear.setNext(tradeFee.setNext(instalmentFee.setNext(taxFee.setNext(netFee.setNext(complete))))))));
-        return init;
+        IHandleable<BillModel> complete = new SettleProcessComplete();
+        
+        return init.setNext(bind.setNext(riskManage.setNext(clear.setNext(tradeFee.setNext(instalmentFee.setNext(taxFee.setNext(netFee.setNext(complete))))))));
     }
 }

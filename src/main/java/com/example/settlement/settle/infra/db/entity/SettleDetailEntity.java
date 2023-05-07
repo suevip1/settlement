@@ -23,6 +23,7 @@ public class SettleDetailEntity implements Serializable {
     private Integer userTradeType;
     private String detailId; // 结算详情单号
     private Date summaryTime; // 汇总时间点
+    private Long initiationCount; // 总发起笔数
     private Long totalCount; // 总交易笔数
     private Long totalAmount; // 总交易金额
 

@@ -23,7 +23,7 @@ public class SettleClearCompleted implements ExpectedEvent {
     private String settleId;
     private List<String> detailIds; // 已处理的汇总详情单号
     private Date settleTime;
-    private Date liquidEntTime;
+    private Date liquidEndTime;
     private Long totalTradeAmount;
     private Long totalTradeCount;
     private Long totalTradeNetAmount;

@@ -18,6 +18,7 @@ public class SettlementConfigEntity implements Serializable {
     private Integer userType; // 商户类型
     private Integer userProduct; // 商户产品类型
     private String configId; // 结算配置ID
+    private Integer netSettleStrategy; // 净结算策略
     private Integer settleRiskStrategy; // 结算风控策略，0正常，1白名单
     private Integer refundMode; // 退款模式（交易手续费）
     private Integer installmentFeeRefundMode; // 退款模式（分期手续费）

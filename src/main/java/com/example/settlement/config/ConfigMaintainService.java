@@ -26,4 +26,8 @@ public class ConfigMaintainService {
     public List<Long> selectActiveUsers() {
        return settleConfigMapper.selectActiveUsers();
     }
+
+    public SettlementConfigEntity getSettleConfig(String configId) {
+        return settleConfigMapper.selectConfigByConfigId(configId);
+    }
 }

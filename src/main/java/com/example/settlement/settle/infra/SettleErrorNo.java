@@ -26,4 +26,5 @@ public interface SettleErrorNo {
     ErrorNo NOT_TIME_TO_CLEARING = new ErrorNo(10013, "未到结算时间");
     ErrorNo RISK_MANAGE_SETTLE_STATUS_ERROR = new ErrorNo(10014, "风控管理结算单状态错误");
     ErrorNo RISK_MANAGE_WAIT = new ErrorNo(10015, "当前风控拦截，不可进行清算");
+    ErrorNo NOT_TIME_TO_SETTLE = new ErrorNo(10016, "未到结算时间");
 }

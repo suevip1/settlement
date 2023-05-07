@@ -18,6 +18,7 @@ public class ClearingSetting {
         Integer userProduct;
         String configId; // 采用的结算配置Id
         Integer settleMode;
+        private Long minSettleAmount;
         String currency;
         Long cityId;
         ZoneId zoneId;

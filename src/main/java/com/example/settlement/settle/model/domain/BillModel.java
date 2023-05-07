@@ -11,11 +11,10 @@ import com.example.settlement.common.exceptions.ErrorNoException;
 import com.example.settlement.settle.infra.SettleErrorNo;
 import com.example.settlement.settle.infra.db.entity.SettleBillEntity;
 import com.example.settlement.settle.infra.db.entity.SettleDetailEntity;
+import com.example.settlement.settle.infra.enums.NetSettleStrategy;
 import com.example.settlement.settle.infra.enums.SettleStatusEnum;
-import com.example.settlement.settle.model.event.SettleBillBound;
-import com.example.settlement.settle.model.event.SettleBindStarted;
-import com.example.settlement.settle.model.event.SettleClearCompleted;
-import com.example.settlement.settle.model.event.SettleRiskManaged;
+import com.example.settlement.settle.infra.enums.WithdrawStatusEnum;
+import com.example.settlement.settle.model.event.*;
 import com.example.settlement.settle.model.valueobj.DetailInfo;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,6 +76,49 @@ public class BillModel {
             handle((SettleClearCompleted) event);
             return ;
         }
+        if (event instanceof SettleBindRestart) {
+            handle((SettleBindRestart) event );
+        }
+        if (event instanceof SettleUnSettledTradeFee) {
+            handle((SettleUnSettledTradeFee) event);
+            return ;
+        }
+        if (event instanceof SettleUnSettledInstallmentFee) {
+            handle((SettleUnSettledInstallmentFee) event);
+            return ;
+        }
+        if (event instanceof SettleUnSettledNet) {
+            handle((SettleUnSettledNet) event);
+            return ;
+        }
+    }
+
+    private void handle(SettleUnSettledNet event) {
+        entity.setVersion(event.getVersion() + 1);
+        entity.setSettleStatus(event.getStatus());
+        entity.setWithdrawStatus(event.getWithdrawStatus());
+        entity.setTotalUnSettledNetAmount(event.getTotalUnsettledNet());
+        entity.setTotalSettledNetAmount(event.getTotalSettledNet());
+    }
+
+    private void handle(SettleUnSettledInstallmentFee event) {
+        entity.setVersion(event.getVersion() + 1);
+        entity.setSettleStatus(event.getStatus());
+        entity.setTotalUnProcessedInstallmentFeeAmount(event.getTotalUnProcessedInstallmentFee());
+        entity.setTotalProcessedInstallmentFeeAmount(event.getTotalProcessedInstallmentFee());
+    }
+
+    private void handle(SettleUnSettledTradeFee event) {
+        entity.setVersion(event.getVersion() + 1);
+        entity.setSettleStatus(event.getStatus());
+        entity.setTotalUnProcessedTradeFeeAmount(event.getTotalUnProcessedTradeFee());
+        entity.setTotalProcessedTradeFeeAmount(event.getTotalProcessedTradeFee());
+    }
+
+    private void handle(SettleBindRestart event) {
+        entity.setSettleStatus(SettleStatusEnum.BINDING.getValue());
+        entity.setVersion(event.getVersion() + 1);
+        details.forEach(e -> e.setState(SummaryStateEnum.BINDING.getValue()));
     }
 
     // 风控拦截 风控拦截交易继续累计不必拿
@@ -151,7 +192,7 @@ public class BillModel {
         event.setSettleId(entity.getSettleId());
         event.setDetailIds(this.details.stream().map(DetailInfo::getDetailId).collect(Collectors.toList()));
         event.setSettleTime(entity.getSettleTime());
-        event.setLiquidEntTime(entity.getLiquidEndTime());
+        event.setLiquidEndTime(entity.getLiquidEndTime());
         event.setDetailCount(details.size());
         event.setCurrency(entity.getCurrency());
         event.setVersion(entity.getVersion());
@@ -200,7 +241,7 @@ public class BillModel {
         event.setTotalTradeNetCount(totalCount);
     }
 
-    private boolean isClearing() {
+    public boolean isClearing() {
        return entity.getSettleStatus() == SettleStatusEnum.CLEARING.getValue();
     }
 
@@ -262,5 +303,94 @@ public class BillModel {
     // 风控拦截是否超时 13 小时
     private boolean riskOverTime() {
         return Instant.now().isAfter(entity.getLiquidEndTime().toInstant().plus(13, ChronoUnit.HOURS));
+    }
+
+    public boolean isWaitSettleUnSettledTradeFee() {
+       return entity.getSettleStatus() == SettleStatusEnum.WAITING_SETTLE_TRADE_FEE.getValue();
+    }
+
+    public Pair<SettleUnSettledTradeFee, UnexpectedEvent> transferUnSettledTradeFee() {
+        if (entity.getSettleStatus() != SettleStatusEnum.WAITING_SETTLE_TRADE_FEE.getValue()) {
+            return Pair.of(null, new ErrorNoUnexpectedEvent(SettleErrorNo.SETTLE_STATUS_ERROR, entity.getSettleId() + ", " + entity.getSettleStatus()));
+        }
+        if (entity.getTotalUnProcessedTradeFeeAmount() < 0) {
+            log.error("");
+        }
+        if (entity.getTotalUnProcessedTradeFeeAmount() == 0) {
+            return Pair.of(new SettleUnSettledTradeFee(entity.getSettleId(), entity.getUserId(), SettleStatusEnum.WAITING_SETTLE_INSTALLMENT_FEE.getValue(), entity.getTotalProcessedTradeFeeAmount(), 0L, entity.getVersion()), null);
+        }
+        // mock 记账服务
+        log.info("记账服务, 转入未处理交易手续费: {}", entity.getTotalUnProcessedTradeFeeAmount());
+        return Pair.of(new SettleUnSettledTradeFee(entity.getSettleId(), entity.getUserId(), SettleStatusEnum.WAITING_SETTLE_INSTALLMENT_FEE.getValue(), entity.getTotalProcessedTradeFeeAmount() + entity.getTotalUnProcessedTradeFeeAmount(), 0L, entity.getVersion()), null);
+    }
+
+    public boolean isWaitSettleUnSettledInstallmentFee() {
+        return entity.getSettleStatus() == SettleStatusEnum.WAITING_SETTLE_INSTALLMENT_FEE.getValue();
+    }
+
+    public Pair<SettleUnSettledInstallmentFee, UnexpectedEvent> transferUnSettledInstallmentFee() {
+        if (entity.getSettleStatus() != SettleStatusEnum.WAITING_SETTLE_INSTALLMENT_FEE.getValue()) {
+            return Pair.of(null, new ErrorNoUnexpectedEvent(SettleErrorNo.SETTLE_STATUS_ERROR, entity.getSettleId() + ", " + entity.getSettleStatus()));
+        }
+        if (entity.getTotalUnProcessedInstallmentFeeAmount() < 0) {
+            log.error("");
+        }
+        if (entity.getTotalUnProcessedInstallmentFeeAmount() == 0) {
+            return Pair.of(new SettleUnSettledInstallmentFee(entity.getSettleId(), entity.getUserId(), SettleStatusEnum.WAITING_SETTLE_TAX_FEE.getValue(), 0L, entity.getTotalProcessedInstallmentFeeAmount(), entity.getVersion()), null);
+        }
+        // mock 记账服务
+        log.info("记账服务, 转入未处理分期手续费: {}", entity.getTotalUnProcessedInstallmentFeeAmount());
+        return Pair.of(new SettleUnSettledInstallmentFee(entity.getSettleId(), entity.getUserId(), SettleStatusEnum.WAITING_SETTLE_TAX_FEE.getValue(), 0L, entity.getTotalProcessedInstallmentFeeAmount() + entity.getTotalUnProcessedInstallmentFeeAmount(), entity.getVersion()), null);
+    }
+
+    public boolean isWaitSettleUnSettledTaxFee() {
+        return entity.getSettleStatus() == SettleStatusEnum.WAITING_SETTLE_TAX_FEE.getValue();
+    }
+
+    public Pair<SettleUnSettledTaxFee, UnexpectedEvent> transferUnSettledTaxFee() {
+        if (entity.getSettleStatus() != SettleStatusEnum.WAITING_SETTLE_TAX_FEE.getValue()) {
+            return Pair.of(null, new ErrorNoUnexpectedEvent(SettleErrorNo.SETTLE_STATUS_ERROR, entity.getSettleId() + ", " + entity.getSettleStatus()));
+        }
+        if (entity.getTotalUnProcessedTaxFeeAmount() < 0) {
+            log.error("");
+        }
+        if (entity.getTotalUnProcessedTaxFeeAmount() == 0) {
+            return Pair.of(new SettleUnSettledTaxFee(entity.getSettleId(), entity.getUserId(), SettleStatusEnum.WAITING_SETTLE_NET.getValue(), 0L, entity.getTotalProcessedTaxFeeAmount(), entity.getVersion()), null);
+        }
+        // mock 记账服务
+        log.info("记账服务, 转入未处理税费: {}", entity.getTotalUnProcessedTaxFeeAmount());
+        return Pair.of(new SettleUnSettledTaxFee(entity.getSettleId(), entity.getUserId(), SettleStatusEnum.WAITING_SETTLE_NET.getValue(), 0L, entity.getTotalProcessedTaxFeeAmount() + entity.getTotalUnProcessedTaxFeeAmount(), entity.getVersion()), null);
+    }
+
+    public boolean isWaitSettleUnSettledNetFee() {
+        return entity.getSettleStatus() == SettleStatusEnum.WAITING_SETTLE_NET.getValue();
+    }
+
+    public Pair<SettleUnSettledNet, UnexpectedEvent> settleUnSettledNetFee(NetSettleStrategy strategy) {
+        if (entity.getSettleStatus() != SettleStatusEnum.WAITING_SETTLE_NET.getValue()) {
+            return Pair.of(null, new ErrorNoUnexpectedEvent(SettleErrorNo.SETTLE_STATUS_ERROR, entity.getSettleId() + ", " + entity.getSettleStatus()));
+        }
+        if (entity.getTotalUnSettledNetAmount() < 0) {
+            log.error("");
+        }
+        int withdrawStatus = -1;
+        switch (strategy) {
+            case TO_CARD -> {
+                withdrawStatus = WithdrawStatusEnum.INIT.getValue();
+                // mock 记账服务
+                log.info("记账服务, 转入未处理净额: {}", entity.getTotalUnSettledNetAmount());
+            }
+            case TO_CASH_ACCT -> {
+                withdrawStatus = WithdrawStatusEnum.SUCCESS_TO_CASH_ACCT.getValue();
+                // mock 记账服务
+                log.info("记账服务, 转入未处理净额: {}", entity.getTotalUnSettledNetAmount());
+            }
+            default -> log.error("不存在改净额结算策略: {}", strategy);
+        }
+        return Pair.of(new SettleUnSettledNet(entity.getSettleId(), entity.getUserId(), SettleStatusEnum.SETTLED.getValue(), 0L, entity.getTotalUnSettledNetAmount() + entity.getTotalSettledNetAmount(), withdrawStatus, entity.getVersion()), null);
+    }
+
+    public boolean isSettled() {
+        return entity.getSettleStatus() == SettleStatusEnum.SETTLED.getValue();
     }
 }

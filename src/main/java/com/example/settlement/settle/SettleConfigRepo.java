@@ -9,8 +9,9 @@ import com.example.settlement.settle.infra.SettleErrorNo;
 import com.example.settlement.settle.infra.db.entity.SettleDetailEntity;
 import com.example.settlement.settle.infra.db.mapper.SettleDetailMapper;
 import com.example.settlement.settle.infra.db.mapper.SettleBillMapper;
+import com.example.settlement.settle.infra.enums.NetSettleStrategy;
 import com.example.settlement.settle.infra.enums.SettleStatusEnum;
-import com.example.settlement.settle.model.domain.GenerateBillModel;
+import com.example.settlement.settle.model.domain.BillSettleModel;
 import com.example.settlement.settle.model.domain.SummaryModel;
 import com.example.settlement.settle.model.valueobj.*;
 import com.google.common.collect.Maps;
@@ -19,10 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -38,7 +36,7 @@ public class SettleConfigRepo {
     @Resource
      private SettleDetailMapper settleDetailMapper;
 
-    public GenerateBillModel getUserSettleModel(Long userId) {
+    public BillSettleModel getUserSettleModel(Long userId) {
         // 1. 获取当前生效的 settleConfig
         List<SettlementConfigEntity> configs = configMaintainService.getSettleConfig(userId);
         if (CollectionUtils.isEmpty(configs)) {
@@ -60,7 +58,7 @@ public class SettleConfigRepo {
         bills.forEach(bill -> refer.put(
                 new SettleKey(bill.settleTime(), configMap.get(bill.configId()).setting().getUserProduct()),
                 bill));
-        return new GenerateBillModel(userId, configMap, refer);
+        return new BillSettleModel(userId, configMap, refer);
     }
 
     public SummaryModel getUserSummaryModel(Long userId) {
@@ -95,5 +93,14 @@ public class SettleConfigRepo {
         setting.setZoneId(ZoneId.systemDefault());
         setting.setCityId(0L); // mock 北京cityId
         return setting;
+    }
+
+    public NetSettleStrategy getSettleStrategy(String configId) {
+        SettlementConfigEntity config = configMaintainService.getSettleConfig(configId);
+        if (config == null) {
+            return NetSettleStrategy.TO_CARD;
+        }
+        NetSettleStrategy netSettleStrategy = NetSettleStrategy.valueOf(config.getNetSettleStrategy());
+        return Objects.requireNonNullElse(netSettleStrategy, NetSettleStrategy.TO_CARD);
     }
 }

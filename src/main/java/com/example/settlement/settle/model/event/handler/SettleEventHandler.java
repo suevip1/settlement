@@ -124,4 +124,63 @@ public class SettleEventHandler {
             Assert.isTrue(detailMapper.updateStateOfDetails(event.getUserId(), event.getSettleId(), event.getDetailIds(), SummaryStateEnum.CLEARING.getValue()) == event.getDetailIds().size(), ErrorNo.DB_UPDATE_ERROR.toString() + event);
         }
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public void process(SettleBindRestart event) {
+        SettleBillEntity updated = SettleBillEntity.builder()
+                .settleStatus(SettleStatusEnum.BINDING.getValue())
+                .settleTime(event.getUpdatedSettleTime())
+                .settleStartTime(event.getUpdatedSettleTime())
+                .liquidEndTime(event.getUpdatedLiquidEndTime())
+                .version(event.getVersion() + 1).build();
+        Assert.isTrue(billMapper.updateSelective(updated, event.getUserId(), event.getSettleId(), event.getVersion()) == 1, ErrorNo.DB_UPDATE_ERROR.toString() + event);
+
+        if (CollectionUtils.isNotEmpty(event.getDetailIds())) {
+            Assert.isTrue(detailMapper.updateStateOfDetails(event.getUserId(), event.getSettleId(), event.getDetailIds(), SummaryStateEnum.BINDING.getValue()) == event.getDetailIds().size(), ErrorNo.DB_UPDATE_ERROR.toString() + event);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public void process(SettleUnSettledTradeFee event) {
+        SettleBillEntity updated = SettleBillEntity.builder()
+                .settleStatus(event.getStatus())
+                .totalProcessedTradeFeeAmount(event.getTotalProcessedTradeFee())
+                .totalUnProcessedTradeFeeAmount(event.getTotalUnProcessedTradeFee())
+                .settleTime(new Date())
+                .version(event.getVersion() + 1).build();
+        Assert.isTrue(billMapper.updateSelective(updated, event.getUserId(), event.getSettleId(), event.getVersion()) == 1, ErrorNo.DB_UPDATE_ERROR.toString() + event);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public void process(SettleUnSettledInstallmentFee event) {
+        SettleBillEntity updated = SettleBillEntity.builder()
+                .settleStatus(event.getStatus())
+                .totalUnProcessedInstallmentFeeAmount(event.getTotalUnProcessedInstallmentFee())
+                .totalProcessedInstallmentFeeAmount(event.getTotalProcessedInstallmentFee())
+                .settleTime(new Date())
+                .version(event.getVersion() + 1).build();
+        Assert.isTrue(billMapper.updateSelective(updated, event.getUserId(), event.getSettleId(), event.getVersion()) == 1, ErrorNo.DB_UPDATE_ERROR.toString() + event);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public void process(SettleUnSettledTaxFee left) {
+        SettleBillEntity updated = SettleBillEntity.builder()
+                .settleStatus(left.getStatus())
+                .totalProcessedTaxFeeAmount(left.getTotalProcessedTaxFee())
+                .totalUnProcessedTaxFeeAmount(left.getTotalUnprocessedTaxFee())
+                .settleTime(new Date())
+                .version(left.getVersion() + 1).build();
+        Assert.isTrue(billMapper.updateSelective(updated, left.getUserId(), left.getSettleId(), left.getVersion()) == 1, ErrorNo.DB_UPDATE_ERROR.toString() + left);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public void process(SettleUnSettledNet event) {
+        SettleBillEntity updated = SettleBillEntity.builder()
+                .settleStatus(event.getStatus())
+                .totalUnSettledNetAmount(event.getTotalUnsettledNet())
+                .totalSettledNetAmount(event.getTotalSettledNet())
+                .settleTime(new Date())
+                .version(event.getVersion() + 1).build();
+        Assert.isTrue(billMapper.updateSelective(updated, event.getUserId(), event.getSettleId(), event.getVersion()) == 1, ErrorNo.DB_UPDATE_ERROR.toString() + event);
+    }
 }
