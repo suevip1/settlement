@@ -25,4 +25,24 @@
         </trim>
 
     </insert>
+
+    <select id="selectByStatusAndMaxTradeId" resultType="com.example.settlement.stuck.infra.db.entity.StuckFlowEntity">
+        select * stuck_flow
+        where status in
+        <foreach collection="statuses" item="status" open="(" separator="," close=")">
+            #{status}
+        </foreach>
+        and trade_id > #{currentTradeId}
+        order by trade_id
+        limit #{batchSize}
+    </select>
+
+    <update id="updateByTradeIdAndTradeType">
+        update stuck_flow
+            <set>
+                <if test="updated.userId != null">user_id = #{updated.userId},</if>
+                <if test="updated.stuckType != null">stuck_type = #{updated.stuckType},</if>
+            </set>
+        where trade_id = #{tradeId} and trade_type = #{tradeType} and version = #{version}
+    </update>
 </mapper>

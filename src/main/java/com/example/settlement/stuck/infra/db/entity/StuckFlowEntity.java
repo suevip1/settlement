@@ -1,6 +1,6 @@
 package com.example.settlement.stuck.infra.db.entity;
 
-import lombok.Data;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -10,6 +10,9 @@ import java.util.Date;
  * @author yangwu_i
  * @date 2023/4/29 11:08
  */
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Data
 public class StuckFlowEntity implements Serializable {
     private Long id; // 自增主键
@@ -26,7 +29,7 @@ public class StuckFlowEntity implements Serializable {
     private Integer lastCode; // 最近异常码
 
     private String lastMsg; // 最近异常信息
-    private Long retryCount; // 自动重试次数
+    private Integer retryTimes; // 自动重试次数
     private Integer status; // 状态
     private String handler; // 人工处理人员
     private String handlerMsg; // 处理意见

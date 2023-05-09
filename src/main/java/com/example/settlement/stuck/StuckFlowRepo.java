@@ -1,9 +1,11 @@
 package com.example.settlement.stuck;
 
+import com.example.settlement.common.event.ExpectedEvent;
 import com.example.settlement.common.exceptions.ErrorNo;
 import com.example.settlement.common.exceptions.ErrorNoException;
 import com.example.settlement.stuck.infra.db.mapper.StuckFlowMapper;
 import com.example.settlement.stuck.infra.db.entity.StuckFlowEntity;
+import com.example.settlement.stuck.infra.event.FlowRetried;
 import com.example.settlement.stuck.infra.event.FlowStuckCreated;
 import com.example.settlement.stuck.model.StuckFlowModel;
 import jakarta.annotation.Resource;
@@ -29,10 +31,12 @@ public class StuckFlowRepo {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
-    public void handle(FlowStuckCreated event) {
+    public void handle(ExpectedEvent event) {
         int result = -1;
         if (event instanceof FlowStuckCreated) {
             result = doHandle((FlowStuckCreated) event);
+        } else if (event instanceof FlowRetried) {
+            result = doHandle((FlowRetried) event);
         }
         if (result == -1) {
             throw new ErrorNoException(ErrorNo.SERVER_ERROR, "Unsupported Event!");
@@ -48,5 +52,16 @@ public class StuckFlowRepo {
         entity.setLastCode(event.getErrorNo());
         entity.setLastMsg(event.getErrorMsg());
         return stuckFlowMapper.insertSelective(entity);
+    }
+
+    private int doHandle(FlowRetried event) {
+        StuckFlowEntity updated = StuckFlowEntity.builder()
+                .tradeId(event.getTradeId())
+                .tradeType(event.getTradeType())
+                .status(event.getStatus())
+                .retryTimes(event.getRetryTimes())
+                .lastCode(event.getErrorNo())
+                .lastMsg(event.getErrorMsg()).build();
+        return stuckFlowMapper.updateByTradeIdAndTradeType(updated);
     }
 }

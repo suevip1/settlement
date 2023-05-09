@@ -3,7 +3,7 @@ package com.example.settlement.clear.infra.jobs;
 import com.alibaba.fastjson.JSONObject;
 import com.example.settlement.clear.infra.db.entity.ClearingBillEntity;
 import com.example.settlement.clear.infra.db.mapper.IClearingBillShardingMapper;
-import com.example.settlement.clear.model.ClearingService;
+import com.example.settlement.clear.model.ClearService;
 import com.example.settlement.clear.infra.enums.ClearStatusEnum;
 import com.example.settlement.common.constant.CommonConstant;
 import com.xxl.job.core.context.XxlJobHelper;
@@ -36,7 +36,7 @@ public class ClearingJob {
     @Resource
     private IClearingBillShardingMapper clearingBillShardingMapper;
     @Resource
-    private ClearingService clearingService;
+    private ClearService clearService;
 
     @XxlJob("clearingJobHandler")
     public void clearingJobHandler() throws Exception {
@@ -76,7 +76,7 @@ public class ClearingJob {
                         List<ClearingBillEntity> list = clearingBillShardingMapper.selectShardingPageByStatus(TABLE_NAME + CommonConstant.UNDERLINE + i, ClearStatusEnum.SUCCESS.getStatus(), tradeFinishTime, maxId + 1, startIndex, PAGE_SIZE);
                         Date now = new Date();
                         list.stream().filter((e) -> e.getTradeFinishTime().compareTo(now) < 0).forEach(e -> {
-                            boolean result = clearingService.handle(e);
+                            boolean result = clearService.handle(e);
                             if (result) {
                                 pageSucCount.getAndIncrement();
                                 successCount.getAndIncrement();

@@ -1,7 +1,11 @@
 package com.example.settlement.stuck.model;
 
+import com.example.settlement.common.event.UnexpectedEvent;
 import com.example.settlement.stuck.infra.db.entity.StuckFlowEntity;
+import com.example.settlement.stuck.infra.event.FlowRetried;
+import com.example.settlement.stuck.infra.handler.ClearBillGateway;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  *
@@ -18,5 +22,7 @@ public class StuckFlowModel {
     }
 
 
-
+    public Pair<FlowRetried, UnexpectedEvent> retry(ClearBillGateway clearingBIllGateWay) {
+        return null;
+    }
 }

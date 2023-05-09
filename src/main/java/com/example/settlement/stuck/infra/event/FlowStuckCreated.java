@@ -24,7 +24,7 @@ public class FlowStuckCreated implements ExpectedEvent {
     private String tradeContext;
     private int errorNo;
     private String errorMsg;
-    private int retryCount;
+    private int retryTimes;
     private int status;
     private String tableIndex;
     private Long tradeFinishTime;

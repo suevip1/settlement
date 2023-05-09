@@ -43,7 +43,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-public class ClearingService {
+public class ClearService {
 
     @Resource
     private IClearingBillMapper clearBillMapper;
@@ -136,24 +136,24 @@ public class ClearingService {
                 return ClearResult.buildSuccessResult();
             case INIT:
                 // 清分计费（各种费用，手续费、分期费、税费、净额）
-                return ((ClearingService) AopContext.currentProxy()).clear(entity);
+                return ((ClearService) AopContext.currentProxy()).clear(entity);
             case CLEAR:
                 // 交易记账
-                return ((ClearingService) AopContext.currentProxy()).transTally(entity);
+                return ((ClearService) AopContext.currentProxy()).transTally(entity);
             case TRANS_TALLY:
                 if (SettleModeEnum.REAL_TIME.getValue() == entity.getSettleMode()) {
                     // 实时结算
-                    return ((ClearingService) AopContext.currentProxy()).realTimeCollectFee(entity);
+                    return ((ClearService) AopContext.currentProxy()).realTimeCollectFee(entity);
                 } else {
                     // 周期结算，各费项累计
-                    return ((ClearingService) AopContext.currentProxy()).accumulateFeeItems(entity);
+                    return ((ClearService) AopContext.currentProxy()).accumulateFeeItems(entity);
                 }
             case REALTIME_SETTLE_FEE_TALLY:
                 // 实时结算，结算净额
-                return ((ClearingService) AopContext.currentProxy()).realTimeSettle(entity);
+                return ((ClearService) AopContext.currentProxy()).realTimeSettle(entity);
             case REALTIME_SETTLE_NET_TALLY:
                 // 各费项累计，应结净额，已结净额，应收手续费，已收手续费
-                return ((ClearingService) AopContext.currentProxy()).accumulateFeeItems(entity);
+                return ((ClearService) AopContext.currentProxy()).accumulateFeeItems(entity);
             case ACCUMULATE:
             case FEE:
                 // 产生分账明细
@@ -200,7 +200,7 @@ public class ClearingService {
                     tradeType(entity.getTradeType()).
                     build();
             if (CollectionUtils.isEmpty(clearIndexMapper.selectBy(idx.getTradeId(), idx.getTradeType()))) {
-                ((ClearingService) AopContext.currentProxy()).accumulate(entity, detailId);
+                ((ClearService) AopContext.currentProxy()).accumulate(entity, detailId);
             }
             return null;
         } else {
@@ -221,7 +221,7 @@ public class ClearingService {
         if (SettleModeEnum.REAL_TIME.getValue() == entity.getSettleMode()) {
             // 实时结算，累计已处理手续费、分期费、税费、净额
             if (entity.getTradeFeeAmount() != null && entity.getTradeFeeAmount() != 0) {
-                settleDetailEntity.setTotalProcessedFee(entity.getTradeFeeAmount());
+                settleDetailEntity.setTotalProcessedTradeFee(entity.getTradeFeeAmount());
             }
             if (entity.getInstallmentFeeAmount() != null && entity.getInstallmentFeeAmount() != 0) {
                 settleDetailEntity.setTotalProcessedInstallmentFee(entity.getInstallmentFeeAmount());
@@ -235,7 +235,7 @@ public class ClearingService {
         } else {
             // 周期结算，累计未处理手续费、分期费、税费、净额
             if (entity.getTradeFeeAmount() != null && entity.getTradeFeeAmount() != 0) {
-                settleDetailEntity.setTotalUnProcessedFee(entity.getTradeFeeAmount());
+                settleDetailEntity.setTotalUnProcessedTradeFee(entity.getTradeFeeAmount());
             }
             if (entity.getInstallmentFeeAmount() != null && entity.getInstallmentFeeAmount() != 0) {
                 settleDetailEntity.setTotalUnProcessedInstallmentFee(entity.getInstallmentFeeAmount());
@@ -364,5 +364,9 @@ public class ClearingService {
             clearResult = refundClearCalculateService.calculate(entity);
         }
         return clearResult;
+    }
+
+    public boolean handleWithoutCoverage(ClearingBillEntity bill) {
+        return false;
     }
 }
