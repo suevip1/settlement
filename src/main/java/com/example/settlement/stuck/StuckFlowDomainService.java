@@ -30,13 +30,13 @@ public class StuckFlowDomainService {
      * @param errorMsg
      * @return
      */
-    public Pair<FlowStuckCreated, UnexpectedEvent> tradeClearingStucked(Long userId, String tradeId, Integer tradeType, int errorNo, String errorMsg) {
+    public Pair<FlowStuckCreated, UnexpectedEvent> tradeClearStucked(Long userId, String tradeId, Integer tradeType, int errorNo, String errorMsg) {
         FlowStuckCreated.FlowStuckCreatedBuilder builder = FlowStuckCreated.builder();
         builder.userId(userId)
                 .stuckType(StuckTypeEnum.Clearing.getCode())
                 .tradeId(tradeId)
                 .tradeType(tradeType)
-                .retryCount(0)
+                .retryTimes(0)
                 .status(StuckFlowStateEnum.AutoRetring.getCode())
                 .errorNo(errorNo)
                 .errorMsg(errorMsg)
@@ -44,5 +44,23 @@ public class StuckFlowDomainService {
                 .tradeFinishTime(Instant.now().toEpochMilli())
                 .remark(tradeId);
         return Pair.of(builder.build(), null);
+    }
+
+    public Pair<FlowStuckCreated, UnexpectedEvent> binlogParseStucked(long userId, String tradeId, Integer tradeType, String tradeContext, int errorCode, String errorMsg) {
+        FlowStuckCreated clearingBill = FlowStuckCreated.builder()
+                .userId(userId)
+                .stuckType(StuckTypeEnum.Clearing.getCode())
+                .tradeId(tradeId)
+                .tradeType(tradeType)
+                .tradeContext(tradeContext)
+                .retryTimes(0)
+                .status(StuckFlowStateEnum.WaitManualProcess.getCode())
+                .errorNo(errorCode)
+                .errorMsg(errorMsg)
+                .tableIndex(ShardingUtil.shardingTableBy1000("clearing_bill", tradeId))
+                .tradeFinishTime(Instant.now().toEpochMilli())
+                .remark("").build();
+        return Pair.of(clearingBill, null);
+
     }
 }

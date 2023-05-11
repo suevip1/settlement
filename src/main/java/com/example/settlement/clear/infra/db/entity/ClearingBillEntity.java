@@ -4,6 +4,7 @@ import com.example.settlement.config.entity.SettlementConfigEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -15,6 +16,7 @@ import java.util.Date;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class ClearingBillEntity implements Serializable {
     private Integer productType;
@@ -26,6 +28,7 @@ public class ClearingBillEntity implements Serializable {
     private Date tradeFinishTime;
     private Integer payType;
     private Integer cardGroup;
+    private Integer installmentTiers;
     private String orderId; // 商户交易单号
     private String originOrderId; // 原商户交易单号
     private Integer settleMode;

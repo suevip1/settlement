@@ -3,7 +3,6 @@ package com.example.settlement.common.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.KeyValueHolder;
 
 import static com.example.settlement.common.enums.FundDirectEnum.*;
 

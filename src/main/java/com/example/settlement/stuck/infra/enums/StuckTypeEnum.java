@@ -18,5 +18,13 @@ public enum StuckTypeEnum {
     private int code;
     private String desc;
 
+    public static StuckTypeEnum valueOf(int code) {
+        for (StuckTypeEnum stuckTypeEnum : StuckTypeEnum.values()) {
+            if (stuckTypeEnum.code == code) {
+                return stuckTypeEnum;
+            }
+        }
+        return null;
+    }
 
 }

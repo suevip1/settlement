@@ -33,7 +33,7 @@ public class StuckFlowEntity implements Serializable {
     private Integer status; // 状态
     private String handler; // 人工处理人员
     private String handlerMsg; // 处理意见
-    private String handlerContext; // 处理变换交易内容，json
+    private String handleContext; // 处理变换交易内容，json
     private String remark; // 备注
     private Integer archived; // 是否存档
     private Integer version; // 乐观锁版本号
