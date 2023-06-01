@@ -39,7 +39,7 @@ public class ClearingJob {
     private ClearService clearService;
 
     @XxlJob("clearingJobHandler")
-    public void clearingJobHandler() throws Exception {
+    public void clearingJobHandler() {
         log.info("清分清算重试任务开始执行");
 
         // 分片参数
@@ -56,13 +56,12 @@ public class ClearingJob {
                     int pageNum = 1; // 页码
                     int startIndex = 0; // 分页起始条目
                     AtomicInteger successCount = new AtomicInteger(); // 表成功数
-                    Date tradeFinishTime = getTradeFinishTime();
+                    Date tradeFinishTime = getClearJobStartDate();
                     Long maxId = clearingBillShardingMapper.getMaxId(TABLE_NAME + CommonConstant.UNDERLINE + i);
                     if (maxId == null || maxId == 0) {
                         log.info("清分清算重试任务执行完成，当前处理的表为：{}，机器编号为：{}， 成功数为：{}", i, shardIndex, successCount);
                         continue;
                     }
-
                     // 分页循环处理
                     while (true) {
                         AtomicLong pageSucCount = new AtomicLong();
@@ -103,7 +102,7 @@ public class ClearingJob {
     }
 
     // 获取任务处理数据的开始时间（扫描几天前的数据，默认扫描昨天的数据）
-    private Date getTradeFinishTime() {
+    private Date getClearJobStartDate() {
         return Date.from(ZonedDateTime.now().minusDays(getDay()).toInstant());
     }
 

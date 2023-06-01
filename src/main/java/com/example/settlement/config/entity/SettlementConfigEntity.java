@@ -1,5 +1,6 @@
 package com.example.settlement.config.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.Date;
  * @date 2023/4/30 20:28
  */
 @Data
+@Builder
 public class SettlementConfigEntity implements Serializable {
     private Long id;
     private String countryCode;

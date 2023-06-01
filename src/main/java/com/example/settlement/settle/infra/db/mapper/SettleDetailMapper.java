@@ -31,4 +31,6 @@ public interface SettleDetailMapper {
     int updateSettleId(Long userId, String settleId, List<String> detailIds);
 
     int updateStateOfDetails(Long userId, String settleId, List<String> detailIds, int status);
+
+    SettleDetailEntity selectOne(Long userId, Integer productType, Integer tradeType, Date summaryTime);
 }

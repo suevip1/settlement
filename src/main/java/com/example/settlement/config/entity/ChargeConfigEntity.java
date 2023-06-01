@@ -1,5 +1,6 @@
 package com.example.settlement.config.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,16 +12,18 @@ import java.util.Date;
  * @date 2023/4/29 17:13
  */
 @Data
+@Builder
 public class ChargeConfigEntity implements Serializable {
     private Long id; // 自增主键
     private String countryCode; // 国家
     private String configId; // 手续费配置唯一 id
-    private Integer userId; // 商户 id
+    private Long userId; // 商户 id
     private Integer userType; // 商户类型
     private Integer userProduct; // 商户产品
     private Integer userTradeType; // 商户交易类型
     private Integer payType; // 商户支付类型
     private Integer cardGroup; // 卡组
+    private Integer installmentTiers;
     private Integer feeCode; // 费项编码
     private String currency; // 币种
     private Integer feeBase; // 计费基数

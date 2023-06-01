@@ -47,6 +47,7 @@ public class ClearingBillEntity implements Serializable {
     private Integer status; // 清分状态机状态
     private Date createTime;
     private Date modifyTime;
+    private SettlementConfigEntity settlementConfig;
 
     @Override
     public boolean equals(Object o) {

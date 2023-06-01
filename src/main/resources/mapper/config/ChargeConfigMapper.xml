@@ -8,4 +8,7 @@
     select * from charge_config
     where user_id = #{userId} and archive = 1
 </select>
+
+<insert id="insertSelective">
+    </insert>
 </mapper>

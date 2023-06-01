@@ -14,4 +14,6 @@ import java.util.List;
 // @Master
 public interface ChargeConfigMapper {
     List<ChargeConfigEntity> selectActiveConfigsByUserId(Long userId);
+
+    void insertSelective(ChargeConfigEntity chargeConfig);
 }

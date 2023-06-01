@@ -23,4 +23,6 @@ public interface SettleConfigMapper {
     SettlementConfigEntity selectConfigByConfigId(String configId);
 
     SettlementConfigEntity selectByUserIdAndProductType(Long userId, Integer productType);
+
+    void insertSelective(SettlementConfigEntity settleConfig);
 }

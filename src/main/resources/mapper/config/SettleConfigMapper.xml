@@ -24,4 +24,15 @@
     <select id="selectByUserIdAndProductType" resultType="com.example.settlement.config.entity.SettlementConfigEntity">
         select * from settle_config where user_id = #{userId} and product_type = #{productType} and archive = 0 and disable = 0
     </select>
+
+<insert id="insertSelective">
+    insert into  settle_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+
+        </trim>
+</insert>
+
 </mapper>

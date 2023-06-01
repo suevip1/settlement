@@ -92,4 +92,9 @@
         #{detailId}
     </foreach>
 </update>
+
+<select id="selectOne" resultType="com.example.settlement.settle.infra.db.entity.SettleDetailEntity">
+    select  * from settle_detail
+    where user_id = #{userId} and user_product = #{user_product} and user_trade_type = #{userTradeType} and summary_time = #{summaryTime}
+    </select>
 </mapper>
